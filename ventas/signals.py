@@ -73,10 +73,42 @@ def restaurar_stock_al_eliminar_detalle(sender, instance, **kwargs):
 def manejar_anulacion_factura(sender, instance, created, **kwargs):
     """
     Signal que maneja la anulación de facturas, restaurando el stock.
-    Nota: Este signal se ejecuta cuando se cambia el estado a ANULADA.
-    El stock se restaura automáticamente cuando se eliminan los detalles (post_delete).
+    Nota: El stock se restaura cuando se cambia el estado a ANULADA.
+    Para evitar duplicados, verificamos si ya se restauró el stock.
     """
-    # Este signal se mantiene por si se necesita lógica adicional al anular
-    # El stock se restaura mediante el signal post_delete de DetalleFactura
-    pass
+    # Solo procesar si el estado es ANULADA y no es una creación nueva
+    if not created and instance.estado == 'ANULADA':
+        # Verificar si ya hay un ajuste de anulación para esta factura
+        # para evitar restaurar el stock múltiples veces
+        from inventario.models import AjusteInventario
+        ajustes_anulacion = AjusteInventario.objects.filter(
+            motivo__contains=f'Anulación de Factura #{instance.numero_factura}'
+        )
+        
+        # Si ya hay ajustes de anulación, no restaurar de nuevo
+        if ajustes_anulacion.exists():
+            return
+        
+        # Restaurar stock de todos los detalles
+        detalles = instance.detalles.all()
+        
+        with transaction.atomic():
+            for detalle in detalles:
+                producto = detalle.producto
+                cantidad_anterior = producto.stock_actual
+                
+                # Restaurar el stock
+                producto.stock_actual += detalle.cantidad
+                producto.save(update_fields=['stock_actual'])
+                
+                # Registrar ajuste de inventario
+                AjusteInventario.objects.create(
+                    producto=producto,
+                    tipo_ajuste='ENTRADA',
+                    cantidad_anterior=cantidad_anterior,
+                    cantidad_nueva=producto.stock_actual,
+                    diferencia=detalle.cantidad,
+                    motivo=f'Anulación de Factura #{instance.numero_factura}',
+                    usuario_registro=instance.vendedor
+                )
 
