@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Ventas del Día - Reportes{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-3xl font-bold text-gray-800">
+        <i class="fas fa-dollar-sign mr-2 text-green-500"></i>Ventas del Día
+    </h1>
+    
+    <!-- Resumen -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <p class="text-gray-500 text-sm font-medium">Total de Ventas</p>
+            <p class="text-3xl font-bold text-gray-800">C$ {{ total_ventas|floatformat:2 }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <p class="text-gray-500 text-sm font-medium">Cantidad de Facturas</p>
+            <p class="text-3xl font-bold text-gray-800">{{ cantidad_facturas }}</p>
+        </div>
+    </div>
+    
+    <!-- Lista de Facturas -->
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-800">Facturas del {{ fecha|date:"d/m/Y" }}</h2>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Número</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hora</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for factura in facturas %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{{ factura.numero_factura }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {{ factura.cliente.nombre|default:factura.cliente_nombre|default:"Cliente General" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ factura.fecha_venta|date:"H:i" }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">C$ {{ factura.total|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">No hay ventas registradas para hoy</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

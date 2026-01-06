@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Catálogo de Productos{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-box mr-2 text-green-500"></i>Catálogo de Productos
+        </h1>
+        <a href="{% url 'catalogos:producto_nuevo' %}" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+            <i class="fas fa-plus-circle mr-2"></i>Agregar Producto
+        </a>
+    </div>
+    
+    <!-- Búsqueda -->
+    <div class="bg-white rounded-lg shadow-md p-4">
+        <form method="get" class="flex gap-4">
+            <input type="text" name="q" value="{{ query }}" placeholder="Buscar producto..." 
+                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+            <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-2 rounded-lg">
+                <i class="fas fa-search mr-2"></i>Buscar
+            </button>
+        </form>
+    </div>
+    
+    <!-- Grid de Productos -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for producto in productos %}
+        <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <h3 class="text-lg font-bold text-gray-800 mb-2">{{ producto.nombre }}</h3>
+            <p class="text-sm text-gray-500 mb-4">Código: {{ producto.codigo }}</p>
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="text-sm text-gray-600">Precio: <span class="font-semibold text-gray-900">C$ {{ producto.precio_venta|floatformat:2 }}</span></p>
+                    <p class="text-sm text-gray-600">Stock: <span class="font-semibold {% if producto.esta_por_agotarse %}text-red-600{% else %}text-gray-900{% endif %}">{{ producto.stock_actual }}</span></p>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full text-center text-gray-500 py-8">
+            No hay productos en el catálogo
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajustes de Inventario{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-3xl font-bold text-gray-800">
+        <i class="fas fa-adjust mr-2 text-yellow-500"></i>Ajustes de Inventario
+    </h1>
+    
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cant. Anterior</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cant. Nueva</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Diferencia</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for ajuste in ajustes %}
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ ajuste.producto.nombre }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if ajuste.tipo_ajuste == 'ENTRADA' %}bg-green-100 text-green-800
+                            {% elif ajuste.tipo_ajuste == 'SALIDA' %}bg-red-100 text-red-800
+                            {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                            {{ ajuste.get_tipo_ajuste_display }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ ajuste.cantidad_anterior }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-semibold">{{ ajuste.cantidad_nueva }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm {% if ajuste.diferencia > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        {{ ajuste.diferencia|stringformat:"+d" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ ajuste.fecha_ajuste|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay ajustes registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+

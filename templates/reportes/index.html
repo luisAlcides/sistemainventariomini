@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes - Minisúper D'Pérez{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <h1 class="text-3xl font-bold text-gray-800">
+        <i class="fas fa-chart-bar mr-2 text-yellow-500"></i>Reportes
+    </h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <a href="{% url 'reportes:ventas_dia' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <i class="fas fa-dollar-sign text-4xl text-green-500 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-800">Ventas del Día</h3>
+            <p class="text-gray-600 mt-2">Reporte de ventas realizadas hoy</p>
+        </a>
+        
+        <a href="{% url 'reportes:productos_por_agotarse' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+            <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+            <h3 class="text-xl font-bold text-gray-800">Productos por Agotarse</h3>
+            <p class="text-gray-600 mt-2">Lista de productos con stock bajo</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
+
