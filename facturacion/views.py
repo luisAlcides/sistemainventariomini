@@ -8,6 +8,7 @@ from django.db.models import Sum, Q
 from django.utils import timezone
 from django.db import transaction
 from django.http import JsonResponse
+from decimal import Decimal
 import json
 
 from ventas.models import Factura, DetalleFactura, Cliente
@@ -56,7 +57,7 @@ def nueva_factura(request):
             # Obtener datos del formulario
             cliente_id = request.POST.get('cliente', '')
             cliente_nombre = request.POST.get('cliente_nombre', '').strip()
-            descuento = float(request.POST.get('descuento', 0) or 0)
+            descuento = Decimal(request.POST.get('descuento', 0) or 0)
             observaciones = request.POST.get('observaciones', '').strip()
             
             # Obtener productos del JSON
@@ -110,14 +111,14 @@ def nueva_factura(request):
                 )
                 
                 # Crear los detalles de la factura
-                subtotal = 0
+                subtotal = Decimal('0.00')
                 for item in productos_data:
                     producto_id = item.get('producto_id')
                     cantidad = int(item.get('cantidad', 0))
                     
                     producto = Producto.objects.get(id=producto_id)
                     precio_unitario = producto.precio_venta
-                    subtotal_item = cantidad * precio_unitario
+                    subtotal_item = Decimal(str(cantidad)) * precio_unitario
                     subtotal += subtotal_item
                     
                     DetalleFactura.objects.create(
