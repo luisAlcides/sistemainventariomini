@@ -4,10 +4,28 @@
 
 {% block content %}
 <div class="space-y-6">
-    <h1 class="text-3xl font-bold text-gray-800">
-        <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>Productos por Agotarse
-    </h1>
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>Productos por Agotarse
+        </h1>
+        <button onclick="window.print()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+            <i class="fas fa-print mr-2"></i>Imprimir
+        </button>
+    </div>
     
+    <!-- Resumen -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+            <p class="text-gray-500 text-sm font-medium">Total de Productos</p>
+            <p class="text-3xl font-bold text-gray-800">{{ total_productos }}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+            <p class="text-gray-500 text-sm font-medium">Valor Total</p>
+            <p class="text-3xl font-bold text-gray-800">C$ {{ valor_total|floatformat:2 }}</p>
+        </div>
+    </div>
+    
+    <!-- Tabla de Productos -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
@@ -18,6 +36,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock Actual</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock Mínimo</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Diferencia</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valor</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -29,12 +48,13 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">{{ producto.stock_actual }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ producto.stock_minimo }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">
-                        {{ producto.stock_actual|add:"-"|add:producto.stock_minimo|stringformat:"d" }}
+                        {{ producto.diferencia_stock }}
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">C$ {{ producto.calcular_valor_inventario|floatformat:2 }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay productos por agotarse</td>
+                    <td colspan="7" class="px-6 py-4 text-center text-gray-500">No hay productos por agotarse</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -42,4 +62,5 @@
     </div>
 </div>
 {% endblock %}
+
 

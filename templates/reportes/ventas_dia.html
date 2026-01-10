@@ -4,12 +4,26 @@
 
 {% block content %}
 <div class="space-y-6">
-    <h1 class="text-3xl font-bold text-gray-800">
-        <i class="fas fa-dollar-sign mr-2 text-green-500"></i>Ventas del Día
-    </h1>
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-calendar-day mr-2 text-green-500"></i>Ventas del Día
+        </h1>
+        <div class="flex space-x-2">
+            <form method="get" class="flex items-center space-x-2">
+                <input type="date" name="fecha" value="{{ fecha|date:'Y-m-d' }}" 
+                       class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+                <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+                    <i class="fas fa-search mr-2"></i>Buscar
+                </button>
+            </form>
+            <button onclick="window.print()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+                <i class="fas fa-print mr-2"></i>Imprimir
+            </button>
+        </div>
+    </div>
     
-    <!-- Resumen -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Estadísticas -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
             <p class="text-gray-500 text-sm font-medium">Total de Ventas</p>
             <p class="text-3xl font-bold text-gray-800">C$ {{ total_ventas|floatformat:2 }}</p>
@@ -18,7 +32,40 @@
             <p class="text-gray-500 text-sm font-medium">Cantidad de Facturas</p>
             <p class="text-3xl font-bold text-gray-800">{{ cantidad_facturas }}</p>
         </div>
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+            <p class="text-gray-500 text-sm font-medium">Promedio por Factura</p>
+            <p class="text-3xl font-bold text-gray-800">C$ {{ promedio_venta|floatformat:2 }}</p>
+        </div>
     </div>
+    
+    <!-- Ventas por Hora -->
+    {% if ventas_por_hora %}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">
+            <i class="fas fa-clock mr-2 text-gray-500"></i>Ventas por Hora
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hora</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cantidad Facturas</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for venta in ventas_por_hora %}
+                    <tr>
+                        <td class="px-4 py-3 text-sm text-gray-900">{{ venta.hora }}:00</td>
+                        <td class="px-4 py-3 text-sm text-gray-600">{{ venta.cantidad }}</td>
+                        <td class="px-4 py-3 text-sm font-semibold text-gray-900">C$ {{ venta.total|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
     
     <!-- Lista de Facturas -->
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
@@ -31,7 +78,9 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Número</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hora</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vendedor</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acción</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -42,11 +91,17 @@
                         {{ factura.cliente.nombre|default:factura.cliente_nombre|default:"Cliente General" }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ factura.fecha_venta|date:"H:i" }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ factura.vendedor.get_full_name|default:factura.vendedor.username }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">C$ {{ factura.total|floatformat:2 }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="{% url 'facturacion:detalle' factura.id %}" class="text-blue-600 hover:text-blue-900">
+                            <i class="fas fa-eye"></i> Ver
+                        </a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="px-6 py-4 text-center text-gray-500">No hay ventas registradas para hoy</td>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay ventas registradas para esta fecha</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -54,4 +109,3 @@
     </div>
 </div>
 {% endblock %}
-

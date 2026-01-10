@@ -137,6 +137,10 @@ class Producto(models.Model):
     def calcular_valor_inventario(self):
         """Calcula el valor total del inventario de este producto."""
         return self.stock_actual * self.precio_compra
+    
+    def diferencia_stock(self):
+        """Calcula la diferencia entre stock actual y stock mínimo."""
+        return self.stock_actual - self.stock_minimo
 
 
 class EntradaCompra(models.Model):

@@ -8,19 +8,79 @@
         <i class="fas fa-chart-bar mr-2 text-yellow-500"></i>Reportes
     </h1>
     
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <a href="{% url 'reportes:ventas_dia' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <i class="fas fa-dollar-sign text-4xl text-green-500 mb-4"></i>
-            <h3 class="text-xl font-bold text-gray-800">Ventas del Día</h3>
-            <p class="text-gray-600 mt-2">Reporte de ventas realizadas hoy</p>
-        </a>
+    <!-- Resumen General -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+            <p class="text-gray-500 text-sm font-medium">Ventas de Hoy</p>
+            <p class="text-3xl font-bold text-gray-800">C$ {{ total_ventas_hoy|floatformat:2 }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ cantidad_facturas_hoy }} facturas</p>
+        </div>
         
-        <a href="{% url 'reportes:productos_por_agotarse' %}" class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-            <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-            <h3 class="text-xl font-bold text-gray-800">Productos por Agotarse</h3>
-            <p class="text-gray-600 mt-2">Lista de productos con stock bajo</p>
-        </a>
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <p class="text-gray-500 text-sm font-medium">Ventas del Mes</p>
+            <p class="text-3xl font-bold text-gray-800">C$ {{ total_ventas_mes|floatformat:2 }}</p>
+            <p class="text-xs text-gray-500 mt-1">{{ cantidad_facturas_mes }} facturas</p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
+            <p class="text-gray-500 text-sm font-medium">Productos por Agotarse</p>
+            <p class="text-3xl font-bold text-gray-800">{{ productos_por_agotarse }}</p>
+            <p class="text-xs text-gray-500 mt-1">Requieren atención</p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500">
+            <p class="text-gray-500 text-sm font-medium">Valor del Inventario</p>
+            <p class="text-3xl font-bold text-gray-800">C$ {{ valor_inventario|floatformat:2 }}</p>
+            <p class="text-xs text-gray-500 mt-1">Stock total</p>
+        </div>
+    </div>
+    
+    <!-- Reportes Disponibles -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Reportes de Ventas -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-receipt mr-2 text-green-500"></i>Reportes de Ventas
+            </h2>
+            <div class="space-y-3">
+                <a href="{% url 'reportes:ventas_dia' %}" class="block w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                    <i class="fas fa-calendar-day mr-2"></i>Ventas del Día
+                </a>
+                <a href="{% url 'reportes:ventas_rango' %}" class="block w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                    <i class="fas fa-calendar-alt mr-2"></i>Ventas por Rango
+                </a>
+            </div>
+        </div>
+        
+        <!-- Reportes de Productos -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-box mr-2 text-blue-500"></i>Reportes de Productos
+            </h2>
+            <div class="space-y-3">
+                <a href="{% url 'reportes:productos_por_agotarse' %}" class="block w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>Por Agotarse
+                </a>
+                <a href="{% url 'reportes:productos_mas_vendidos' %}" class="block w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                    <i class="fas fa-star mr-2"></i>Más Vendidos
+                </a>
+                <a href="{% url 'reportes:valor_inventario' %}" class="block w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                    <i class="fas fa-dollar-sign mr-2"></i>Valor de Inventario
+                </a>
+            </div>
+        </div>
+        
+        <!-- Reportes de Clientes -->
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-users mr-2 text-purple-500"></i>Reportes de Clientes
+            </h2>
+            <div class="space-y-3">
+                <a href="{% url 'reportes:clientes_frecuentes' %}" class="block w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                    <i class="fas fa-user-friends mr-2"></i>Clientes Frecuentes
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
-
