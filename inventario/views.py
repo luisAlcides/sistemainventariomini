@@ -211,14 +211,16 @@ def nueva_entrada(request):
                 )
                 
                 # Crear los detalles de la entrada
-                total = 0
+                from decimal import Decimal
+                total = Decimal('0.00')
                 for item in productos_data:
                     producto_id = item.get('producto_id')
                     cantidad = int(item.get('cantidad', 0))
-                    precio_unitario = float(item.get('precio_unitario', 0))
+                    # Usar precio_unitario si existe, sino usar precio
+                    precio_unitario = Decimal(str(item.get('precio_unitario') or item.get('precio', 0)))
                     
                     producto = Producto.objects.get(id=producto_id)
-                    subtotal = cantidad * precio_unitario
+                    subtotal = Decimal(str(cantidad)) * precio_unitario
                     total += subtotal
                     
                     DetalleEntradaCompra.objects.create(

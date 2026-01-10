@@ -12,14 +12,18 @@ from .models import DetalleEntradaCompra, AjusteInventario
 def aumentar_stock_al_comprar(sender, instance, created, **kwargs):
     """
     Signal que aumenta automáticamente el stock del producto cuando se registra una entrada de compra.
+    También calcula el costo promedio y actualiza el precio de venta si está configurado.
     """
     if created:
         producto = instance.producto
         
         with transaction.atomic():
-            # Aumentar el stock
+            # Aumentar el stock primero
             producto.stock_actual += instance.cantidad
             producto.save(update_fields=['stock_actual'])
+            
+            # Calcular y actualizar costo promedio (esto también guarda el producto)
+            producto.actualizar_costo_promedio()
 
 
 @receiver(post_save, sender=AjusteInventario)

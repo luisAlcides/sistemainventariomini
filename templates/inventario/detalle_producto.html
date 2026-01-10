@@ -53,8 +53,22 @@
                         <p class="font-semibold text-gray-800">C$ {{ producto.precio_compra|floatformat:2 }}</p>
                     </div>
                     <div>
+                        <p class="text-sm text-gray-500">Costo Promedio</p>
+                        <p class="font-semibold text-blue-600">C$ {{ producto.costo_promedio|floatformat:2 }}</p>
+                        <p class="text-xs text-gray-500">Calculado automáticamente</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Porcentaje de Ganancia</p>
+                        <p class="font-semibold text-gray-800">{{ producto.porcentaje_ganancia|floatformat:2 }}%</p>
+                    </div>
+                    <div>
                         <p class="text-sm text-gray-500">Precio de Venta</p>
                         <p class="font-semibold text-gray-800">C$ {{ producto.precio_venta|floatformat:2 }}</p>
+                        {% if producto.actualizar_precio_automatico %}
+                        <p class="text-xs text-green-600">
+                            <i class="fas fa-check-circle mr-1"></i>Actualización automática activa
+                        </p>
+                        {% endif %}
                     </div>
                     <div>
                         <p class="text-sm text-gray-500">Stock Actual</p>

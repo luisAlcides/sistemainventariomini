@@ -13,8 +13,9 @@ class ProductoForm(forms.ModelForm):
         model = Producto
         fields = [
             'codigo', 'nombre', 'descripcion', 'categoria', 
-            'precio_venta', 'precio_compra', 'stock_actual', 
-            'stock_minimo', 'unidad_medida', 'activo'
+            'precio_venta', 'precio_compra', 'costo_promedio',
+            'porcentaje_ganancia', 'actualizar_precio_automatico',
+            'stock_actual', 'stock_minimo', 'unidad_medida', 'activo'
         ]
         widgets = {
             'codigo': forms.TextInput(attrs={
@@ -43,6 +44,20 @@ class ProductoForm(forms.ModelForm):
                 'step': '0.01',
                 'min': '0'
             }),
+            'costo_promedio': forms.NumberInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent',
+                'step': '0.01',
+                'min': '0',
+                'readonly': True
+            }),
+            'porcentaje_ganancia': forms.NumberInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
+                'step': '0.01',
+                'min': '0'
+            }),
+            'actualizar_precio_automatico': forms.CheckboxInput(attrs={
+                'class': 'w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500'
+            }),
             'stock_actual': forms.NumberInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'min': '0'
@@ -66,6 +81,9 @@ class ProductoForm(forms.ModelForm):
             'categoria': 'Categoría',
             'precio_venta': 'Precio de Venta (C$)',
             'precio_compra': 'Precio de Compra (C$)',
+            'costo_promedio': 'Costo Promedio (C$)',
+            'porcentaje_ganancia': 'Porcentaje de Ganancia (%)',
+            'actualizar_precio_automatico': 'Actualizar Precio Automáticamente',
             'stock_actual': 'Stock Actual',
             'stock_minimo': 'Stock Mínimo',
             'unidad_medida': 'Unidad de Medida',

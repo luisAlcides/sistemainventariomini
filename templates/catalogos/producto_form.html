@@ -74,8 +74,34 @@
                         <span class="absolute left-3 top-2 text-gray-500">C$</span>
                         {{ form.precio_compra }}
                     </div>
+                    <p class="text-xs text-gray-500 mt-1">Precio de compra inicial (se actualizará con costo promedio)</p>
                     {% if form.precio_compra.errors %}
                         <p class="text-red-500 text-xs mt-1">{{ form.precio_compra.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label for="{{ form.costo_promedio.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.costo_promedio.label }}
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-2 text-gray-500">C$</span>
+                        {{ form.costo_promedio }}
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Calculado automáticamente basado en todas las compras</p>
+                </div>
+                
+                <div>
+                    <label for="{{ form.porcentaje_ganancia.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        {{ form.porcentaje_ganancia.label }}
+                    </label>
+                    <div class="relative">
+                        {{ form.porcentaje_ganancia }}
+                        <span class="absolute right-3 top-2 text-gray-500">%</span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Porcentaje de ganancia para calcular precio de venta</p>
+                    {% if form.porcentaje_ganancia.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.porcentaje_ganancia.errors.0 }}</p>
                     {% endif %}
                 </div>
                 
@@ -87,9 +113,21 @@
                         <span class="absolute left-3 top-2 text-gray-500">C$</span>
                         {{ form.precio_venta }}
                     </div>
+                    <p class="text-xs text-gray-500 mt-1" id="precioVentaInfo">
+                        {% if form.actualizar_precio_automatico.value %}
+                        Se actualizará automáticamente: C$ <span id="precioCalculado">0.00</span>
+                        {% endif %}
+                    </p>
                     {% if form.precio_venta.errors %}
                         <p class="text-red-500 text-xs mt-1">{{ form.precio_venta.errors.0 }}</p>
                     {% endif %}
+                </div>
+                
+                <div class="flex items-center">
+                    {{ form.actualizar_precio_automatico }}
+                    <label for="{{ form.actualizar_precio_automatico.id_for_label }}" class="ml-2 text-sm font-medium text-gray-700">
+                        {{ form.actualizar_precio_automatico.label }}
+                    </label>
                 </div>
                 
                 <div>
@@ -133,4 +171,48 @@
         </div>
     </form>
 </div>
+
+<script>
+// Calcular precio de venta automáticamente cuando cambian los valores
+document.addEventListener('DOMContentLoaded', function() {
+    const precioCompra = document.getElementById('id_precio_compra');
+    const porcentajeGanancia = document.getElementById('id_porcentaje_ganancia');
+    const precioVenta = document.getElementById('id_precio_venta');
+    const actualizarAuto = document.getElementById('id_actualizar_precio_automatico');
+    const precioCalculado = document.getElementById('precioCalculado');
+    const precioVentaInfo = document.getElementById('precioVentaInfo');
+    
+    function calcularPrecioVenta() {
+        if (precioCompra && porcentajeGanancia && precioCalculado) {
+            const costo = parseFloat(precioCompra.value) || 0;
+            const ganancia = parseFloat(porcentajeGanancia.value) || 0;
+            
+            if (costo > 0 && ganancia >= 0) {
+                const precio = costo * (1 + ganancia / 100);
+                precioCalculado.textContent = precio.toFixed(2);
+                
+                if (actualizarAuto && actualizarAuto.checked) {
+                    precioVenta.value = precio.toFixed(2);
+                }
+            }
+        }
+    }
+    
+    if (precioCompra) precioCompra.addEventListener('input', calcularPrecioVenta);
+    if (porcentajeGanancia) porcentajeGanancia.addEventListener('input', calcularPrecioVenta);
+    if (actualizarAuto) {
+        actualizarAuto.addEventListener('change', function() {
+            if (this.checked) {
+                calcularPrecioVenta();
+                if (precioVentaInfo) precioVentaInfo.style.display = 'block';
+            } else {
+                if (precioVentaInfo) precioVentaInfo.style.display = 'none';
+            }
+        });
+    }
+    
+    // Calcular al cargar la página
+    calcularPrecioVenta();
+});
+</script>
 {% endblock %}

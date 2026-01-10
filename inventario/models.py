@@ -5,6 +5,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.utils import timezone
 from usuarios.models import Usuario
+from decimal import Decimal
 
 
 class Categoria(models.Model):
@@ -82,6 +83,27 @@ class Producto(models.Model):
         verbose_name='Precio de Compra (C$)',
         help_text='Precio de compra en Córdobas Nicaragüenses'
     )
+    costo_promedio = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        verbose_name='Costo Promedio (C$)',
+        help_text='Costo promedio calculado automáticamente basado en todas las compras',
+        default=0
+    )
+    porcentaje_ganancia = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        validators=[MinValueValidator(0)],
+        verbose_name='Porcentaje de Ganancia (%)',
+        help_text='Porcentaje de ganancia para calcular precio de venta automáticamente',
+        default=30.00
+    )
+    actualizar_precio_automatico = models.BooleanField(
+        default=True,
+        verbose_name='Actualizar Precio Automáticamente',
+        help_text='Si está activo, el precio de venta se actualiza automáticamente al calcular el costo promedio'
+    )
     stock_actual = models.IntegerField(
         default=0,
         validators=[MinValueValidator(0)],
@@ -136,11 +158,63 @@ class Producto(models.Model):
     
     def calcular_valor_inventario(self):
         """Calcula el valor total del inventario de este producto."""
-        return self.stock_actual * self.precio_compra
+        # Usar costo_promedio si está disponible, sino precio_compra
+        costo = self.costo_promedio if self.costo_promedio > 0 else self.precio_compra
+        return self.stock_actual * costo
     
     def diferencia_stock(self):
         """Calcula la diferencia entre stock actual y stock mínimo."""
         return self.stock_actual - self.stock_minimo
+    
+    def calcular_precio_venta_automatico(self):
+        """Calcula el precio de venta basado en el costo promedio y porcentaje de ganancia."""
+        from decimal import Decimal
+        costo = self.costo_promedio if self.costo_promedio > 0 else self.precio_compra
+        if costo > 0:
+            ganancia = costo * (self.porcentaje_ganancia / Decimal('100'))
+            return costo + ganancia
+        return self.precio_venta
+    
+    def actualizar_costo_promedio(self):
+        """
+        Calcula y actualiza el costo promedio basado en todas las entradas de compra.
+        Fórmula: Costo Promedio Ponderado = Suma(Cantidad * Precio) / Suma(Cantidades)
+        """
+        from decimal import Decimal
+        
+        # Obtener todas las entradas de compra del producto (usando related_name)
+        detalles = self.entradas_compra.all()
+        
+        if not detalles.exists():
+            # Si no hay entradas, usar el precio_compra inicial
+            if self.precio_compra > 0:
+                self.costo_promedio = self.precio_compra
+                self.save(update_fields=['costo_promedio'])
+            return
+        
+        # Calcular costo promedio ponderado
+        total_cantidad = Decimal('0')
+        total_valor = Decimal('0')
+        
+        for detalle in detalles:
+            cantidad = Decimal(str(detalle.cantidad))
+            precio = detalle.precio_unitario
+            total_cantidad += cantidad
+            total_valor += cantidad * precio
+        
+        if total_cantidad > 0:
+            costo_promedio = total_valor / total_cantidad
+            self.costo_promedio = costo_promedio
+            
+            # Actualizar precio_compra con el costo promedio (para referencia)
+            self.precio_compra = costo_promedio
+            
+            # Si está activo, actualizar precio de venta automáticamente
+            if self.actualizar_precio_automatico:
+                self.precio_venta = self.calcular_precio_venta_automatico()
+                self.save(update_fields=['costo_promedio', 'precio_compra', 'precio_venta'])
+            else:
+                self.save(update_fields=['costo_promedio', 'precio_compra'])
 
 
 class EntradaCompra(models.Model):
