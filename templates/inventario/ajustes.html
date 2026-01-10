@@ -4,9 +4,29 @@
 
 {% block content %}
 <div class="space-y-6">
-    <h1 class="text-3xl font-bold text-gray-800">
-        <i class="fas fa-adjust mr-2 text-yellow-500"></i>Ajustes de Inventario
-    </h1>
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-adjust mr-2 text-yellow-500"></i>Ajustes de Inventario
+        </h1>
+        <a href="{% url 'inventario:ajuste_nuevo' %}" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+            <i class="fas fa-plus-circle mr-2"></i>Nuevo Ajuste
+        </a>
+    </div>
+    
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow-md p-4">
+        <form method="get" class="flex flex-wrap gap-4">
+            <select name="tipo" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500">
+                <option value="">Todos los tipos</option>
+                <option value="ENTRADA" {% if tipo_selected == 'ENTRADA' %}selected{% endif %}>Entrada</option>
+                <option value="SALIDA" {% if tipo_selected == 'SALIDA' %}selected{% endif %}>Salida</option>
+                <option value="CORRECCION" {% if tipo_selected == 'CORRECCION' %}selected{% endif %}>Corrección</option>
+            </select>
+            <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-2 rounded-lg">
+                <i class="fas fa-search mr-2"></i>Filtrar
+            </button>
+        </form>
+    </div>
     
     <div class="bg-white rounded-lg shadow-md overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">

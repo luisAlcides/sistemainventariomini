@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Inventario{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-adjust mr-2 text-yellow-500"></i>{{ titulo }}
+        </h1>
+        <a href="{% url 'inventario:ajustes' %}" class="text-gray-600 hover:text-gray-800">
+            <i class="fas fa-arrow-left mr-2"></i>Volver
+        </a>
+    </div>
+    
+    <form method="post" id="ajusteForm" class="bg-white rounded-lg shadow-md p-6">
+        {% csrf_token %}
+        
+        <div class="space-y-4">
+            <div>
+                <label for="{{ form.producto.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.producto.label }} <span class="text-red-500">*</span>
+                </label>
+                {{ form.producto }}
+                {% if form.producto.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.producto.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.tipo_ajuste.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.tipo_ajuste.label }} <span class="text-red-500">*</span>
+                </label>
+                {{ form.tipo_ajuste }}
+                {% if form.tipo_ajuste.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.tipo_ajuste.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-lg">
+                <p class="text-sm text-gray-600 mb-2">Stock Actual:</p>
+                <p class="text-lg font-bold text-gray-800" id="stockActual">Seleccione un producto</p>
+            </div>
+            
+            <div>
+                <label for="{{ form.cantidad_nueva.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.cantidad_nueva.label }} <span class="text-red-500">*</span>
+                </label>
+                {{ form.cantidad_nueva }}
+                {% if form.cantidad_nueva.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.cantidad_nueva.errors.0 }}</p>
+                {% endif %}
+            </div>
+            
+            <div>
+                <label for="{{ form.motivo.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                    {{ form.motivo.label }} <span class="text-red-500">*</span>
+                </label>
+                {{ form.motivo }}
+                {% if form.motivo.errors %}
+                    <p class="text-red-500 text-xs mt-1">{{ form.motivo.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="mt-6 flex justify-end space-x-4">
+            <a href="{% url 'inventario:ajustes' %}" 
+               class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg transition">
+                <i class="fas fa-times mr-2"></i>Cancelar
+            </a>
+            <button type="submit" 
+                    class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 rounded-lg transition">
+                <i class="fas fa-save mr-2"></i>Guardar Ajuste
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.getElementById('id_producto').addEventListener('change', function() {
+    const productoId = this.value;
+    if (productoId) {
+        fetch(`/inventario/api/producto/${productoId}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('stockActual').textContent = data.stock_actual + ' ' + data.unidad_medida;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    } else {
+        document.getElementById('stockActual').textContent = 'Seleccione un producto';
+    }
+});
+</script>
+{% endblock %}
+
