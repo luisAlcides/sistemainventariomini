@@ -7,9 +7,9 @@ from django.contrib import messages
 from django.db.models import Q
 
 from django.db.models import Sum
-from inventario.models import Producto, Categoria
+from inventario.models import Producto, Categoria, NombreProducto
 from ventas.models import Cliente
-from .forms import ClienteForm, ProductoCatalogForm, CategoriaCatalogForm
+from .forms import ClienteForm, ProductoCatalogForm, CategoriaCatalogForm, NombreProductoForm
 
 
 @login_required
@@ -20,11 +20,13 @@ def index(request):
     total_productos = Producto.objects.filter(activo=True).count()
     total_categorias = Categoria.objects.filter(activa=True).count()
     total_clientes = Cliente.objects.filter(activo=True).count()
+    total_nombres_productos = NombreProducto.objects.filter(activo=True).count()
     
     context = {
         'total_productos': total_productos,
         'total_categorias': total_categorias,
         'total_clientes': total_clientes,
+        'total_nombres_productos': total_nombres_productos,
     }
     
     return render(request, 'catalogos/index.html', context)
@@ -35,14 +37,14 @@ def lista_productos(request):
     """
     Lista de productos (catálogo).
     """
-    productos = Producto.objects.filter(activo=True).order_by('nombre')
+    productos = Producto.objects.filter(activo=True).order_by('nombre_producto__nombre')
     
     query = request.GET.get('q', '')
     categoria_id = request.GET.get('categoria', '')
     
     if query:
         productos = productos.filter(
-            Q(nombre__icontains=query) |
+            Q(nombre_producto__nombre__icontains=query) |
             Q(codigo__icontains=query) |
             Q(descripcion__icontains=query)
         )
@@ -136,7 +138,7 @@ def lista_clientes(request):
     
     if query:
         clientes = clientes.filter(
-            Q(nombre__icontains=query) |
+            Q(nombre_producto__nombre__icontains=query) |
             Q(cedula__icontains=query) |
             Q(telefono__icontains=query) |
             Q(email__icontains=query)
@@ -297,4 +299,107 @@ def categoria_editar(request, categoria_id):
     }
     
     return render(request, 'catalogos/categoria_form.html', context)
+
+
+# ========== NOMBRES DE PRODUCTOS ==========
+
+@login_required
+def lista_nombres_productos(request):
+    """
+    Lista de nombres de productos.
+    """
+    nombres = NombreProducto.objects.all().order_by('nombre')
+    
+    query = request.GET.get('q', '')
+    categoria_id = request.GET.get('categoria', '')
+    estado = request.GET.get('estado', '')
+    
+    if query:
+        nombres = nombres.filter(
+            Q(nombre__icontains=query) |
+            Q(descripcion__icontains=query)
+        )
+    
+    if categoria_id:
+        nombres = nombres.filter(categoria_id=categoria_id)
+    
+    if estado == 'activo':
+        nombres = nombres.filter(activo=True)
+    elif estado == 'inactivo':
+        nombres = nombres.filter(activo=False)
+    
+    categorias = Categoria.objects.filter(activa=True).order_by('nombre')
+    
+    context = {
+        'nombres': nombres,
+        'categorias': categorias,
+        'query': query,
+        'categoria_selected': categoria_id,
+        'estado_selected': estado,
+    }
+    
+    return render(request, 'catalogos/nombres_productos.html', context)
+
+
+@login_required
+def nombre_producto_nuevo(request):
+    """
+    Crear nuevo nombre de producto.
+    """
+    if request.method == 'POST':
+        form = NombreProductoForm(request.POST)
+        if form.is_valid():
+            nombre_producto = form.save()
+            messages.success(request, f'Nombre de producto "{nombre_producto.nombre}" creado exitosamente.')
+            return redirect('catalogos:nombres_productos')
+    else:
+        form = NombreProductoForm()
+    
+    context = {
+        'form': form,
+        'titulo': 'Nuevo Nombre de Producto',
+    }
+    
+    return render(request, 'catalogos/nombre_producto_form.html', context)
+
+
+@login_required
+def nombre_producto_editar(request, nombre_producto_id):
+    """
+    Editar nombre de producto.
+    """
+    nombre_producto = get_object_or_404(NombreProducto, id=nombre_producto_id)
+    
+    if request.method == 'POST':
+        form = NombreProductoForm(request.POST, instance=nombre_producto)
+        if form.is_valid():
+            nombre_producto = form.save()
+            messages.success(request, f'Nombre de producto "{nombre_producto.nombre}" actualizado exitosamente.')
+            return redirect('catalogos:nombres_productos')
+    else:
+        form = NombreProductoForm(instance=nombre_producto)
+    
+    context = {
+        'form': form,
+        'nombre_producto': nombre_producto,
+        'titulo': f'Editar Nombre: {nombre_producto.nombre}',
+    }
+    
+    return render(request, 'catalogos/nombre_producto_form.html', context)
+
+
+@login_required
+def nombre_producto_detalle(request, nombre_producto_id):
+    """
+    Ver detalle de nombre de producto.
+    """
+    nombre_producto = get_object_or_404(NombreProducto, id=nombre_producto_id)
+    productos = nombre_producto.productos.filter(activo=True)
+    
+    context = {
+        'nombre_producto': nombre_producto,
+        'productos': productos,
+    }
+    
+    return render(request, 'catalogos/nombre_producto_detalle.html', context)
 

@@ -2,7 +2,7 @@
 Formularios para el módulo de inventario.
 """
 from django import forms
-from inventario.models import Producto, Categoria, EntradaCompra, DetalleEntradaCompra, AjusteInventario
+from inventario.models import Producto, Categoria, NombreProducto, EntradaCompra, DetalleEntradaCompra, AjusteInventario
 
 
 class ProductoForm(forms.ModelForm):
@@ -12,19 +12,18 @@ class ProductoForm(forms.ModelForm):
     class Meta:
         model = Producto
         fields = [
-            'codigo', 'nombre', 'descripcion', 'categoria', 
+            'codigo', 'nombre_producto', 'descripcion', 'categoria', 
             'precio_venta', 'precio_compra', 'costo_promedio',
             'porcentaje_ganancia', 'actualizar_precio_automatico',
-            'stock_actual', 'stock_minimo', 'unidad_medida', 'activo'
+            'stock_actual', 'stock_minimo', 'activo'
         ]
         widgets = {
             'codigo': forms.TextInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'placeholder': 'Código único del producto'
             }),
-            'nombre': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
-                'placeholder': 'Nombre del producto'
+            'nombre_producto': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent'
             }),
             'descripcion': forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
@@ -35,23 +34,23 @@ class ProductoForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent'
             }),
             'precio_venta': forms.NumberInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
+                'class': 'w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'step': '0.01',
                 'min': '0'
             }),
             'precio_compra': forms.NumberInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
+                'class': 'w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'step': '0.01',
                 'min': '0'
             }),
             'costo_promedio': forms.NumberInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent',
+                'class': 'w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg bg-gray-100 focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'step': '0.01',
                 'min': '0',
                 'readonly': True
             }),
             'porcentaje_ganancia': forms.NumberInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
+                'class': 'w-full pl-4 pr-10 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'step': '0.01',
                 'min': '0'
             }),
@@ -66,18 +65,14 @@ class ProductoForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'min': '0'
             }),
-            'unidad_medida': forms.TextInput(attrs={
-                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
-                'placeholder': 'Ej: unidad, kg, litro, caja'
-            }),
             'activo': forms.CheckboxInput(attrs={
                 'class': 'w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500'
             }),
         }
         labels = {
             'codigo': 'Código del Producto',
-            'nombre': 'Nombre del Producto',
-            'descripcion': 'Descripción',
+            'nombre_producto': 'Nombre del Producto',
+            'descripcion': 'Descripción Específica',
             'categoria': 'Categoría',
             'precio_venta': 'Precio de Venta (C$)',
             'precio_compra': 'Precio de Compra (C$)',
@@ -86,9 +81,22 @@ class ProductoForm(forms.ModelForm):
             'actualizar_precio_automatico': 'Actualizar Precio Automáticamente',
             'stock_actual': 'Stock Actual',
             'stock_minimo': 'Stock Mínimo',
-            'unidad_medida': 'Unidad de Medida',
             'activo': 'Producto Activo',
         }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Filtrar solo nombres de productos activos
+        self.fields['nombre_producto'].queryset = NombreProducto.objects.filter(activo=True).order_by('nombre')
+        # Si hay una categoría seleccionada, filtrar nombres por categoría
+        if 'categoria' in self.data:
+            try:
+                categoria_id = int(self.data.get('categoria'))
+                self.fields['nombre_producto'].queryset = NombreProducto.objects.filter(
+                    activo=True, categoria_id=categoria_id
+                ).order_by('nombre')
+            except (ValueError, TypeError):
+                pass
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -176,7 +184,7 @@ class DetalleEntradaCompraForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['producto'].queryset = Producto.objects.filter(activo=True).order_by('nombre')
+        self.fields['producto'].queryset = Producto.objects.filter(activo=True).order_by('nombre_producto__nombre')
 
 
 class AjusteInventarioForm(forms.ModelForm):
@@ -212,5 +220,5 @@ class AjusteInventarioForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['producto'].queryset = Producto.objects.filter(activo=True).order_by('nombre')
+        self.fields['producto'].queryset = Producto.objects.filter(activo=True).order_by('nombre_producto__nombre')
 

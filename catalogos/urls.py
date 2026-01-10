@@ -19,5 +19,10 @@ urlpatterns = [
     path('categorias/', views.lista_categorias, name='categorias'),
     path('categorias/nueva/', views.categoria_nueva, name='categoria_nueva'),
     path('categorias/<int:categoria_id>/editar/', views.categoria_editar, name='categoria_editar'),
+    # Nombres de Productos
+    path('nombres-productos/', views.lista_nombres_productos, name='nombres_productos'),
+    path('nombres-productos/nuevo/', views.nombre_producto_nuevo, name='nombre_producto_nuevo'),
+    path('nombres-productos/<int:nombre_producto_id>/', views.nombre_producto_detalle, name='nombre_producto_detalle'),
+    path('nombres-productos/<int:nombre_producto_id>/editar/', views.nombre_producto_editar, name='nombre_producto_editar'),
 ]
 

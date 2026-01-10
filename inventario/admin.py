@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Categoria, Producto, EntradaCompra, DetalleEntradaCompra, AjusteInventario
+from .models import Categoria, NombreProducto, Producto, EntradaCompra, DetalleEntradaCompra, AjusteInventario
 
 
 @admin.register(Categoria)
@@ -8,6 +8,26 @@ class CategoriaAdmin(admin.ModelAdmin):
     list_filter = ['activa']
     search_fields = ['nombre', 'descripcion']
     readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
+
+
+@admin.register(NombreProducto)
+class NombreProductoAdmin(admin.ModelAdmin):
+    list_display = ['nombre', 'categoria', 'unidad_medida', 'activo', 'fecha_creacion']
+    list_filter = ['categoria', 'activo']
+    search_fields = ['nombre', 'descripcion']
+    readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
+    fieldsets = (
+        ('Información Básica', {
+            'fields': ('nombre', 'categoria', 'unidad_medida', 'descripcion')
+        }),
+        ('Estado', {
+            'fields': ('activo',)
+        }),
+        ('Fechas', {
+            'fields': ('fecha_creacion', 'fecha_actualizacion'),
+            'classes': ('collapse',)
+        }),
+    )
 
 
 class DetalleEntradaCompraInline(admin.TabularInline):
@@ -33,16 +53,16 @@ class EntradaCompraAdmin(admin.ModelAdmin):
 
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ['codigo', 'nombre', 'categoria', 'precio_venta', 'stock_actual', 'stock_minimo', 'activo']
-    list_filter = ['categoria', 'activo']
-    search_fields = ['codigo', 'nombre', 'descripcion']
+    list_display = ['codigo', 'nombre_producto', 'categoria', 'precio_venta', 'stock_actual', 'stock_minimo', 'activo']
+    list_filter = ['categoria', 'activo', 'nombre_producto']
+    search_fields = ['codigo', 'nombre_producto__nombre', 'descripcion']
     readonly_fields = ['fecha_creacion', 'fecha_actualizacion']
     fieldsets = (
         ('Información Básica', {
-            'fields': ('codigo', 'nombre', 'descripcion', 'categoria', 'unidad_medida')
+            'fields': ('codigo', 'nombre_producto', 'descripcion', 'categoria')
         }),
         ('Precios', {
-            'fields': ('precio_compra', 'precio_venta')
+            'fields': ('precio_compra', 'costo_promedio', 'porcentaje_ganancia', 'precio_venta', 'actualizar_precio_automatico')
         }),
         ('Inventario', {
             'fields': ('stock_actual', 'stock_minimo')
@@ -61,7 +81,7 @@ class ProductoAdmin(admin.ModelAdmin):
 class AjusteInventarioAdmin(admin.ModelAdmin):
     list_display = ['producto', 'tipo_ajuste', 'cantidad_anterior', 'cantidad_nueva', 'diferencia', 'usuario_registro', 'fecha_ajuste']
     list_filter = ['tipo_ajuste', 'fecha_ajuste', 'usuario_registro']
-    search_fields = ['producto__nombre', 'producto__codigo', 'motivo']
+    search_fields = ['producto__nombre_producto__nombre', 'producto__codigo', 'motivo']
     readonly_fields = ['diferencia', 'fecha_creacion']
     
     def save_model(self, request, obj, form, change):

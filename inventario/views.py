@@ -46,7 +46,7 @@ def lista_productos(request):
     """
     Lista de productos.
     """
-    productos = Producto.objects.all().order_by('nombre')
+    productos = Producto.objects.all().order_by('nombre_producto__nombre')
     
     query = request.GET.get('q', '')
     categoria_id = request.GET.get('categoria', '')
@@ -54,7 +54,7 @@ def lista_productos(request):
     
     if query:
         productos = productos.filter(
-            Q(nombre__icontains=query) |
+            Q(nombre_producto__nombre__icontains=query) |
             Q(codigo__icontains=query) |
             Q(descripcion__icontains=query)
         )
@@ -247,7 +247,7 @@ def nueva_entrada(request):
     
     # GET: Mostrar formulario
     form = EntradaCompraForm(initial={'fecha_compra': timezone.now().date()})
-    productos = Producto.objects.filter(activo=True).order_by('nombre')
+    productos = Producto.objects.filter(activo=True).order_by('nombre_producto__nombre')
     
     context = {
         'form': form,

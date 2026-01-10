@@ -44,9 +44,68 @@ class Categoria(models.Model):
         return self.nombre
 
 
+class NombreProducto(models.Model):
+    """
+    Modelo para almacenar los nombres de productos (catálogo de nombres).
+    Permite reutilizar el mismo nombre de producto en diferentes instancias.
+    """
+    nombre = models.CharField(
+        max_length=200,
+        unique=True,
+        verbose_name='Nombre del Producto',
+        help_text='Nombre único del producto (ej: Arroz, Azúcar, etc.)'
+    )
+    descripcion = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Descripción General',
+        help_text='Descripción general del producto'
+    )
+    categoria = models.ForeignKey(
+        Categoria,
+        on_delete=models.PROTECT,
+        related_name='nombres_productos',
+        verbose_name='Categoría',
+        help_text='Categoría a la que pertenece este producto'
+    )
+    unidad_medida = models.CharField(
+        max_length=20,
+        default='unidad',
+        verbose_name='Unidad de Medida',
+        help_text='Ej: unidad, kg, litro, caja, etc.'
+    )
+    activo = models.BooleanField(
+        default=True,
+        verbose_name='Nombre Activo',
+        help_text='Si está inactivo, no se podrá usar en nuevos productos'
+    )
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Fecha de Creación'
+    )
+    fecha_actualizacion = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Fecha de Actualización'
+    )
+    
+    class Meta:
+        verbose_name = 'Nombre de Producto'
+        verbose_name_plural = 'Nombres de Productos'
+        ordering = ['nombre']
+        indexes = [
+            models.Index(fields=['nombre']),
+            models.Index(fields=['categoria']),
+            models.Index(fields=['activo']),
+        ]
+    
+    def __str__(self):
+        return self.nombre
+
+
 class Producto(models.Model):
     """
     Modelo para los productos del inventario.
+    Cada producto tiene un código único y referencia a un NombreProducto.
     """
     codigo = models.CharField(
         max_length=50,
@@ -54,20 +113,25 @@ class Producto(models.Model):
         verbose_name='Código del Producto',
         help_text='Código único del producto (SKU, código de barras, etc.)'
     )
-    nombre = models.CharField(
-        max_length=200,
-        verbose_name='Nombre del Producto'
+    nombre_producto = models.ForeignKey(
+        NombreProducto,
+        on_delete=models.PROTECT,
+        related_name='productos',
+        verbose_name='Nombre del Producto',
+        help_text='Nombre del producto del catálogo'
     )
     descripcion = models.TextField(
         blank=True,
         null=True,
-        verbose_name='Descripción'
+        verbose_name='Descripción Específica',
+        help_text='Descripción específica de esta instancia del producto (opcional)'
     )
     categoria = models.ForeignKey(
         Categoria,
         on_delete=models.PROTECT,
         related_name='productos',
-        verbose_name='Categoría'
+        verbose_name='Categoría',
+        help_text='Categoría del producto (heredada del nombre de producto)'
     )
     precio_venta = models.DecimalField(
         max_digits=10,
@@ -138,7 +202,7 @@ class Producto(models.Model):
     class Meta:
         verbose_name = 'Producto'
         verbose_name_plural = 'Productos'
-        ordering = ['nombre']
+        ordering = ['nombre_producto__nombre', 'codigo']
         indexes = [
             models.Index(fields=['codigo']),
             models.Index(fields=['categoria']),
@@ -146,7 +210,17 @@ class Producto(models.Model):
         ]
     
     def __str__(self):
-        return f"{self.nombre} ({self.codigo})"
+        return f"{self.nombre_producto.nombre} ({self.codigo})"
+    
+    @property
+    def nombre(self):
+        """Propiedad para compatibilidad con código existente."""
+        return self.nombre_producto.nombre
+    
+    @property
+    def unidad_medida(self):
+        """Propiedad para obtener la unidad de medida del nombre de producto."""
+        return self.nombre_producto.unidad_medida
     
     def esta_por_agotarse(self):
         """Verifica si el producto está por agotarse (stock <= stock_minimo)."""
