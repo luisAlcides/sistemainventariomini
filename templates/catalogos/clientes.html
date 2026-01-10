@@ -4,15 +4,31 @@
 
 {% block content %}
 <div class="space-y-6">
-    <h1 class="text-3xl font-bold text-gray-800">
-        <i class="fas fa-users mr-2 text-purple-500"></i>Clientes
-    </h1>
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-users mr-2 text-purple-500"></i>Clientes
+        </h1>
+        <a href="{% url 'catalogos:cliente_nuevo' %}" class="bg-purple-500 hover:bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg transition">
+            <i class="fas fa-plus-circle mr-2"></i>Nuevo Cliente
+        </a>
+    </div>
     
-    <!-- Búsqueda -->
+    <!-- Filtros -->
     <div class="bg-white rounded-lg shadow-md p-4">
-        <form method="get" class="flex gap-4">
+        <form method="get" class="flex flex-wrap gap-4">
             <input type="text" name="q" value="{{ query }}" placeholder="Buscar cliente..." 
-                   class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                   class="flex-1 min-w-[200px] px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+            <select name="tipo" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                <option value="">Todos los tipos</option>
+                <option value="REGULAR" {% if tipo_selected == 'REGULAR' %}selected{% endif %}>Regular</option>
+                <option value="FRECUENTE" {% if tipo_selected == 'FRECUENTE' %}selected{% endif %}>Frecuente</option>
+                <option value="MAYORISTA" {% if tipo_selected == 'MAYORISTA' %}selected{% endif %}>Mayorista</option>
+            </select>
+            <select name="estado" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                <option value="">Todos los estados</option>
+                <option value="activo" {% if estado_selected == 'activo' %}selected{% endif %}>Activos</option>
+                <option value="inactivo" {% if estado_selected == 'inactivo' %}selected{% endif %}>Inactivos</option>
+            </select>
             <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-6 py-2 rounded-lg">
                 <i class="fas fa-search mr-2"></i>Buscar
             </button>
@@ -29,6 +45,7 @@
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Teléfono</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Estado</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
@@ -44,10 +61,18 @@
                             {% if cliente.activo %}Activo{% else %}Inactivo{% endif %}
                         </span>
                     </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <a href="{% url 'catalogos:cliente_detalle' cliente.id %}" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{% url 'catalogos:cliente_editar' cliente.id %}" class="text-purple-600 hover:text-purple-900">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="px-6 py-4 text-center text-gray-500">No hay clientes registrados</td>
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500">No hay clientes registrados</td>
                 </tr>
                 {% endfor %}
             </tbody>
