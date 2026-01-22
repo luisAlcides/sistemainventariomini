@@ -389,6 +389,23 @@ def crear_ajuste(request):
 
 
 @login_required
+def obtener_nombre_producto_info(request, nombre_producto_id):
+    """
+    API endpoint para obtener información de un nombre de producto (JSON).
+    """
+    try:
+        nombre_producto = NombreProducto.objects.get(id=nombre_producto_id, activo=True)
+        return JsonResponse({
+            'id': nombre_producto.id,
+            'nombre': nombre_producto.nombre,
+            'categoria_id': nombre_producto.categoria.id,
+            'unidad_medida': nombre_producto.unidad_medida,
+        })
+    except NombreProducto.DoesNotExist:
+        return JsonResponse({'error': 'Nombre de producto no encontrado'}, status=404)
+
+
+@login_required
 def obtener_producto_info(request, producto_id):
     """
     API endpoint para obtener información de un producto (JSON).

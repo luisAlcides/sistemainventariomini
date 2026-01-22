@@ -219,12 +219,13 @@
 // Variables globales
 let productosAgregados = [];
 let totalGlobal = 0;
+let tomSelectProducto;
 
 // Inicializar Tom Select con diseño profesional
 document.addEventListener('DOMContentLoaded', function() {
     const el = document.getElementById('productoSelect');
     if (el) {
-        new TomSelect(el, {
+        tomSelectProducto = new TomSelect(el, {
             create: false,
             maxOptions: 10,
             searchField: ['nombre', 'codigo'],
@@ -489,8 +490,9 @@ document.getElementById('agregarProductoBtn').addEventListener('click', function
     actualizarResumen();
     
     // Limpiar campos
-    if (productoSelect.tomselect) {
-        productoSelect.tomselect.setValue('');
+    if (tomSelectProducto) {
+        tomSelectProducto.clear();
+        tomSelectProducto.focus();
     } else {
         productoSelect.value = '';
     }

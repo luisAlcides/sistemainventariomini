@@ -235,6 +235,31 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Calcular al cargar la página
     calcularPrecioVenta();
+
+    // Lógica para seleccionar categoría automáticamente según el Nombre del Producto
+    const nombreProductoSelect = document.getElementById('id_nombre_producto');
+    const categoriaSelect = document.getElementById('id_categoria');
+
+    if (nombreProductoSelect) {
+        nombreProductoSelect.addEventListener('change', function() {
+            const nombreId = this.value;
+            if (nombreId && categoriaSelect) {
+                fetch(`/inventario/api/nombre-producto/${nombreId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.categoria_id) {
+                            // Actualizar el valor en el select original
+                            categoriaSelect.value = data.categoria_id;
+                            // Si Tom Select está habilitado, actualizar la interfaz visual
+                            if (categoriaSelect.tomselect) {
+                                categoriaSelect.tomselect.setValue(data.categoria_id);
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+    }
 });
 </script>
 {% endblock %}

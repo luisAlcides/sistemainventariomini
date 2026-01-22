@@ -2,7 +2,46 @@
 Formularios para el módulo de inventario.
 """
 from django import forms
-from inventario.models import Producto, Categoria, NombreProducto, EntradaCompra, DetalleEntradaCompra, AjusteInventario
+from inventario.models import Producto, Categoria, NombreProducto, Proveedor, EntradaCompra, DetalleEntradaCompra, AjusteInventario
+
+
+class ProveedorForm(forms.ModelForm):
+    """
+    Formulario para crear/editar proveedores.
+    """
+    class Meta:
+        model = Proveedor
+        fields = ['nombre', 'ruc', 'contacto', 'telefono', 'email', 'direccion', 'activo']
+        widgets = {
+            'nombre': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                'placeholder': 'Nombre del proveedor'
+            }),
+            'ruc': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                'placeholder': 'Número de RUC (opcional)'
+            }),
+            'contacto': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                'placeholder': 'Nombre de la persona de contacto'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                'placeholder': 'Teléfono'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                'placeholder': 'Correo electrónico'
+            }),
+            'direccion': forms.Textarea(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+                'rows': 3,
+                'placeholder': 'Dirección'
+            }),
+            'activo': forms.CheckboxInput(attrs={
+                'class': 'w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500'
+            }),
+        }
 
 
 class ProductoForm(forms.ModelForm):
@@ -152,9 +191,8 @@ class EntradaCompraForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
                 'placeholder': 'Número de factura del proveedor'
             }),
-            'proveedor': forms.TextInput(attrs={
+            'proveedor': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
-                'placeholder': 'Nombre del proveedor'
             }),
             'fecha_compra': forms.DateInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent',
@@ -172,6 +210,10 @@ class EntradaCompraForm(forms.ModelForm):
             'fecha_compra': 'Fecha de Compra',
             'observaciones': 'Observaciones',
         }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['proveedor'].queryset = Proveedor.objects.filter(activo=True).order_by('nombre')
 
 
 class DetalleEntradaCompraForm(forms.ModelForm):

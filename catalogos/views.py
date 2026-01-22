@@ -7,9 +7,9 @@ from django.contrib import messages
 from django.db.models import Q
 
 from django.db.models import Sum
-from inventario.models import Producto, Categoria, NombreProducto
+from inventario.models import Producto, Categoria, NombreProducto, Proveedor
 from ventas.models import Cliente
-from .forms import ClienteForm, ProductoCatalogForm, CategoriaCatalogForm, NombreProductoForm
+from .forms import ClienteForm, ProductoCatalogForm, CategoriaCatalogForm, NombreProductoForm, ProveedorForm
 
 
 @login_required
@@ -21,15 +21,119 @@ def index(request):
     total_categorias = Categoria.objects.filter(activa=True).count()
     total_clientes = Cliente.objects.filter(activo=True).count()
     total_nombres_productos = NombreProducto.objects.filter(activo=True).count()
+    total_proveedores = Proveedor.objects.filter(activo=True).count()
     
     context = {
         'total_productos': total_productos,
         'total_categorias': total_categorias,
         'total_clientes': total_clientes,
         'total_nombres_productos': total_nombres_productos,
+        'total_proveedores': total_proveedores,
     }
     
     return render(request, 'catalogos/index.html', context)
+
+
+@login_required
+def lista_proveedores(request):
+    """
+    Lista de proveedores.
+    """
+    proveedores = Proveedor.objects.all().order_by('nombre')
+    
+    query = request.GET.get('q', '')
+    estado = request.GET.get('estado', '')
+    
+    if query:
+        proveedores = proveedores.filter(
+            Q(nombre__icontains=query) |
+            Q(ruc__icontains=query) |
+            Q(contacto__icontains=query) |
+            Q(telefono__icontains=query) |
+            Q(email__icontains=query)
+        )
+    
+    if estado == 'activo':
+        proveedores = proveedores.filter(activo=True)
+    elif estado == 'inactivo':
+        proveedores = proveedores.filter(activo=False)
+    
+    context = {
+        'proveedores': proveedores,
+        'query': query,
+        'estado_selected': estado,
+    }
+    
+    return render(request, 'catalogos/proveedores.html', context)
+
+
+@login_required
+def proveedor_nuevo(request):
+    """
+    Crear un nuevo proveedor.
+    """
+    if request.method == 'POST':
+        form = ProveedorForm(request.POST)
+        if form.is_valid():
+            proveedor = form.save()
+            messages.success(request, f'Proveedor "{proveedor.nombre}" creado exitosamente.')
+            return redirect('catalogos:proveedores')
+    else:
+        form = ProveedorForm()
+    
+    context = {
+        'form': form,
+        'titulo': 'Nuevo Proveedor',
+    }
+    
+    return render(request, 'catalogos/proveedor_form.html', context)
+
+
+@login_required
+def proveedor_editar(request, proveedor_id):
+    """
+    Editar un proveedor existente.
+    """
+    proveedor = get_object_or_404(Proveedor, id=proveedor_id)
+    
+    if request.method == 'POST':
+        form = ProveedorForm(request.POST, instance=proveedor)
+        if form.is_valid():
+            proveedor = form.save()
+            messages.success(request, f'Proveedor "{proveedor.nombre}" actualizado exitosamente.')
+            return redirect('catalogos:proveedores')
+    else:
+        form = ProveedorForm(instance=proveedor)
+    
+    context = {
+        'form': form,
+        'proveedor': proveedor,
+        'titulo': f'Editar Proveedor: {proveedor.nombre}',
+    }
+    
+    return render(request, 'catalogos/proveedor_form.html', context)
+
+
+@login_required
+def proveedor_detalle(request, proveedor_id):
+    """
+    Ver detalle de un proveedor.
+    """
+    proveedor = get_object_or_404(Proveedor, id=proveedor_id)
+    
+    # Obtener últimas compras al proveedor
+    compras = proveedor.compras.all().order_by('-fecha_compra')[:10]
+    total_compras = proveedor.compras.count()
+    monto_total = proveedor.compras.aggregate(total=Sum('total'))['total'] or 0
+    
+    context = {
+        'proveedor': proveedor,
+        'compras': compras,
+        'total_compras': total_compras,
+        'monto_total': monto_total,
+    }
+    
+    return render(request, 'catalogos/proveedor_detalle.html', context)
 
 
 @login_required

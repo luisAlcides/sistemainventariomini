@@ -347,6 +347,69 @@ class Producto(models.Model):
                 self.save(update_fields=['costo_promedio', 'precio_compra'])
 
 
+class Proveedor(models.Model):
+    """
+    Modelo para los proveedores de mercancía.
+    """
+    nombre = models.CharField(
+        max_length=200,
+        verbose_name='Nombre del Proveedor'
+    )
+    ruc = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True,
+        verbose_name='RUC',
+        help_text='Número de RUC (opcional)'
+    )
+    contacto = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        verbose_name='Persona de Contacto'
+    )
+    telefono = models.CharField(
+        max_length=17,
+        blank=True,
+        null=True,
+        verbose_name='Teléfono'
+    )
+    email = models.EmailField(
+        blank=True,
+        null=True,
+        verbose_name='Correo Electrónico'
+    )
+    direccion = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Dirección'
+    )
+    activo = models.BooleanField(
+        default=True,
+        verbose_name='Proveedor Activo'
+    )
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Fecha de Creación'
+    )
+    fecha_actualizacion = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Fecha de Actualización'
+    )
+    
+    class Meta:
+        verbose_name = 'Proveedor'
+        verbose_name_plural = 'Proveedores'
+        ordering = ['nombre']
+        indexes = [
+            models.Index(fields=['nombre']),
+            models.Index(fields=['activo']),
+        ]
+    
+    def __str__(self):
+        return self.nombre
+
+
 class EntradaCompra(models.Model):
     """
     Modelo para registrar las entradas de productos al inventario (compras).
@@ -356,8 +419,10 @@ class EntradaCompra(models.Model):
         verbose_name='Número de Factura de Compra',
         help_text='Número de factura del proveedor'
     )
-    proveedor = models.CharField(
-        max_length=200,
+    proveedor = models.ForeignKey(
+        Proveedor,
+        on_delete=models.PROTECT,
+        related_name='compras',
         verbose_name='Proveedor'
     )
     fecha_compra = models.DateField(

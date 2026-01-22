@@ -4,7 +4,7 @@ Formularios para el módulo de catálogos.
 from django import forms
 from ventas.models import Cliente
 from inventario.models import Categoria, Producto, NombreProducto
-from inventario.forms import ProductoForm, CategoriaForm
+from inventario.forms import ProductoForm, CategoriaForm, ProveedorForm
 
 
 class ClienteForm(forms.ModelForm):

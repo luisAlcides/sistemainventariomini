@@ -483,16 +483,18 @@ function eliminarProducto(index) {
 }
 
 // Mostrar proveedor en el resumen
-document.getElementById('id_proveedor').addEventListener('input', function() {
+document.getElementById('id_proveedor').addEventListener('change', function() {
     const proveedorNombre = document.getElementById('proveedorNombre');
-    proveedorNombre.textContent = this.value || '-';
+    const selectedOption = this.options[this.selectedIndex];
+    proveedorNombre.textContent = selectedOption.text || '-';
 });
 
 // Inicializar proveedor si ya tiene valor
 document.addEventListener('DOMContentLoaded', function() {
     const proveedorInput = document.getElementById('id_proveedor');
     if (proveedorInput && proveedorInput.value) {
-        document.getElementById('proveedorNombre').textContent = proveedorInput.value;
+        const selectedOption = proveedorInput.options[proveedorInput.selectedIndex];
+        document.getElementById('proveedorNombre').textContent = selectedOption ? selectedOption.text : '-';
     }
 });
 

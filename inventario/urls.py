@@ -17,5 +17,6 @@ urlpatterns = [
     path('ajustes/', views.lista_ajustes, name='ajustes'),
     path('ajustes/nuevo/', views.crear_ajuste, name='ajuste_nuevo'),
     path('api/producto/<int:producto_id>/', views.obtener_producto_info, name='obtener_producto_info'),
+    path('api/nombre-producto/<int:nombre_producto_id>/', views.obtener_nombre_producto_info, name='obtener_nombre_producto_info'),
 ]
 
