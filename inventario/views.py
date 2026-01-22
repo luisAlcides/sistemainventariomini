@@ -263,8 +263,8 @@ def nueva_entrada(request):
                 for item in productos_data:
                     producto_id = item.get('producto_id')
                     cantidad = int(item.get('cantidad', 0))
-                    # Usar precio_unitario si existe, sino usar precio
                     precio_unitario = Decimal(str(item.get('precio_unitario') or item.get('precio', 0)))
+                    fecha_vencimiento = item.get('fecha_vencimiento') or None
                     
                     producto = Producto.objects.get(id=producto_id)
                     subtotal = Decimal(str(cantidad)) * precio_unitario
@@ -275,8 +275,15 @@ def nueva_entrada(request):
                         producto=producto,
                         cantidad=cantidad,
                         precio_unitario=precio_unitario,
-                        subtotal=subtotal
+                        subtotal=subtotal,
+                        fecha_vencimiento=fecha_vencimiento
                     )
+                    
+                    # Actualizar fecha de expiración del producto si la nueva es más reciente o el producto no tiene
+                    if fecha_vencimiento:
+                        if not producto.fecha_expiracion or fecha_vencimiento < str(producto.fecha_expiracion):
+                            producto.fecha_expiracion = fecha_vencimiento
+                            producto.save(update_fields=['fecha_expiracion'])
                 
                 # Actualizar total de la entrada
                 entrada.total = total

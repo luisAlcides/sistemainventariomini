@@ -180,6 +180,12 @@ class Producto(models.Model):
         verbose_name='Stock Mínimo',
         help_text='Cantidad mínima antes de alertar'
     )
+    unidades_por_paquete = models.IntegerField(
+        default=1,
+        validators=[MinValueValidator(1)],
+        verbose_name='Unidades por Paquete/Caja',
+        help_text='Ej: Si compra una caja de 24 unidades, ponga 24. Si vende por unidad individual, ponga 1.'
+    )
     fecha_expiracion = models.DateField(
         blank=True,
         null=True,
@@ -426,6 +432,11 @@ class DetalleEntradaCompra(models.Model):
         validators=[MinValueValidator(0)],
         verbose_name='Subtotal (C$)'
     )
+    fecha_vencimiento = models.DateField(
+        null=True,
+        blank=True,
+        verbose_name='Fecha de Vencimiento del Lote'
+    )
     
     class Meta:
         verbose_name = 'Detalle de Entrada/Compra'
@@ -443,12 +454,21 @@ class DetalleEntradaCompra(models.Model):
 
 class AjusteInventario(models.Model):
     """
-    Modelo para registrar ajustes de inventario (inventarios físicos, correcciones, etc.).
+    Modelo para registrar ajustes de inventario (mermas, inventarios físicos, correcciones, etc.).
     """
     TIPO_AJUSTE_CHOICES = [
-        ('ENTRADA', 'Entrada'),
-        ('SALIDA', 'Salida'),
-        ('CORRECCION', 'Corrección'),
+        ('AUMENTO', 'Aumento (+)'),
+        ('DISMINUCION', 'Disminución (-)'),
+    ]
+
+    MOTIVO_CHOICES = [
+        ('INVENTARIO_INICIAL', 'Inventario Inicial'),
+        ('CORRECCION', 'Corrección de Error'),
+        ('ROTURA', 'Merma por Rotura/Daño'),
+        ('VENCIMIENTO', 'Merma por Vencimiento'),
+        ('ROBO', 'Merma por Robo/Pérdida'),
+        ('CONSUMO', 'Consumo Interno'),
+        ('OTRO', 'Otro Motivo'),
     ]
     
     producto = models.ForeignKey(
@@ -462,20 +482,28 @@ class AjusteInventario(models.Model):
         choices=TIPO_AJUSTE_CHOICES,
         verbose_name='Tipo de Ajuste'
     )
+    motivo = models.CharField(
+        max_length=30,
+        choices=MOTIVO_CHOICES,
+        default='CORRECCION',
+        verbose_name='Motivo del Ajuste'
+    )
     cantidad_anterior = models.IntegerField(
         validators=[MinValueValidator(0)],
         verbose_name='Cantidad Anterior'
     )
     cantidad_nueva = models.IntegerField(
         validators=[MinValueValidator(0)],
-        verbose_name='Cantidad Nueva'
+        verbose_name='Cantidad Nueva (Física Real)'
     )
     diferencia = models.IntegerField(
         verbose_name='Diferencia',
         help_text='Diferencia calculada automáticamente'
     )
-    motivo = models.TextField(
-        verbose_name='Motivo del Ajuste'
+    observaciones = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Observaciones adicionales'
     )
     usuario_registro = models.ForeignKey(
         Usuario,

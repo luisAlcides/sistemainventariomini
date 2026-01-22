@@ -37,6 +37,14 @@ def dashboard(request):
     
     # Total de clientes activos
     total_clientes = Cliente.objects.filter(activo=True).count()
+
+    # Productos por expirar (próximos 30 días)
+    from datetime import timedelta
+    fecha_limite = hoy + timedelta(days=30)
+    productos_por_expirar = Producto.objects.filter(
+        activo=True,
+        fecha_expiracion__lte=fecha_limite
+    ).count()
     
     # Últimas 5 facturas
     ultimas_facturas = Factura.objects.filter(
@@ -47,6 +55,7 @@ def dashboard(request):
         'fecha_actual': fecha_actual,
         'ventas_dia': ventas_dia,
         'productos_por_agotarse': productos_por_agotarse,
+        'productos_por_expirar': productos_por_expirar,
         'total_productos': total_productos,
         'total_clientes': total_clientes,
         'ultimas_facturas': ultimas_facturas,

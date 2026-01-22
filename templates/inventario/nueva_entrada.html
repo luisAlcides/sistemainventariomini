@@ -92,7 +92,8 @@
                                         data-precio="{{ producto.precio_compra }}"
                                         data-costo-promedio="{{ producto.costo_promedio }}"
                                         data-nombre="{{ producto.nombre }}"
-                                        data-unidad="{{ producto.unidad_medida }}">
+                                        data-unidad="{{ producto.unidad_medida }}"
+                                        data-unidades-paquete="{{ producto.unidades_por_paquete }}">
                                     [{{ producto.codigo }}] {{ producto.nombre }} (Costo prom: C$ {{ producto.costo_promedio|floatformat:2 }})
                                 </option>
                                 {% endfor %}
@@ -101,16 +102,47 @@
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Modo de Ingreso</label>
+                                <div class="flex items-center space-x-4 p-2 bg-gray-50 rounded-lg border border-gray-200">
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="modo_ingreso" value="unidades" checked class="mr-2" onchange="cambiarModoIngreso('unidades')">
+                                        <span class="text-sm">Unidades</span>
+                                    </label>
+                                    <label class="flex items-center cursor-pointer">
+                                        <input type="radio" name="modo_ingreso" value="paquetes" class="mr-2" onchange="cambiarModoIngreso('paquetes')">
+                                        <span class="text-sm">Cajas/Paquetes</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div id="divCantidadUnidades">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad (Unidades)</label>
                                 <input type="number" id="cantidadInput" min="1" value="1"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                             </div>
+                            <div id="divCantidadPaquetes" class="hidden">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cant. Cajas/Paquetes</label>
+                                <div class="flex space-x-2">
+                                    <input type="number" id="paquetesInput" min="1" value="1"
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                                    <div class="bg-blue-100 text-blue-800 px-3 py-2 rounded-lg text-xs font-bold flex flex-col justify-center">
+                                        <span>x <span id="spanUnidadesPorPaquete">1</span></span>
+                                        <span>unid.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Precio Unit. (C$)</label>
                                 <input type="number" id="precioInput" step="0.01" min="0"
                                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                                        placeholder="0.00">
                                 <p class="text-xs text-gray-500 mt-1" id="precioSugerido"></p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Vencimiento (Opcional)</label>
+                                <input type="date" id="vencimientoInput"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                             </div>
                         </div>
                     </div>
@@ -271,6 +303,19 @@ const productoSelect = document.getElementById('productoSelect');
 const productoIdSeleccionado = document.getElementById('productoIdSeleccionado');
 const precioInput = document.getElementById('precioInput');
 const precioSugerido = document.getElementById('precioSugerido');
+const spanUnidades = document.getElementById('spanUnidadesPorPaquete');
+
+function cambiarModoIngreso(modo) {
+    const divUnidades = document.getElementById('divCantidadUnidades');
+    const divPaquetes = document.getElementById('divCantidadPaquetes');
+    if (modo === 'unidades') {
+        divUnidades.classList.remove('hidden');
+        divPaquetes.classList.add('hidden');
+    } else {
+        divUnidades.classList.add('hidden');
+        divPaquetes.classList.remove('hidden');
+    }
+}
 
 // Escuchar cambios en el select (Tom Select actualiza el select original)
 productoSelect.addEventListener('change', function() {
@@ -279,6 +324,7 @@ productoSelect.addEventListener('change', function() {
         productoIdSeleccionado.value = '';
         precioInput.value = '';
         precioSugerido.textContent = '';
+        spanUnidades.textContent = '1';
         return;
     }
     
@@ -287,35 +333,44 @@ productoSelect.addEventListener('change', function() {
     const precio = option.dataset.precio;
     const costoPromedio = option.dataset.costoPromedio;
     const unidad = option.dataset.unidad;
+    const unidadesPaquete = option.dataset.unidadesPaquete || 1;
     
     productoIdSeleccionado.value = productoId;
     precioInput.value = precio || costoPromedio || '';
     precioSugerido.textContent = costoPromedio && parseFloat(costoPromedio) > 0 
         ? `Costo promedio: C$ ${parseFloat(costoPromedio).toFixed(2)}` 
         : '';
+    spanUnidades.textContent = unidadesPaquete;
 });
 
 document.getElementById('agregarProductoBtn').addEventListener('click', function() {
     const cantidadInput = document.getElementById('cantidadInput');
+    const paquetesInput = document.getElementById('paquetesInput');
+    const vencimientoInput = document.getElementById('vencimientoInput');
+    const modoIngreso = document.querySelector('input[name="modo_ingreso"]:checked').value;
     
     const productoId = productoIdSeleccionado.value;
-    const cantidad = parseInt(cantidadInput.value) || 1;
     const precio = parseFloat(precioInput.value) || 0;
+    const vencimiento = vencimientoInput.value;
     
     if (!productoId) {
         alert('Por favor seleccione un producto');
         return;
     }
     
-    if (precio <= 0) {
-        alert('El precio debe ser mayor a cero');
-        return;
+    let cantidad = 0;
+    const option = productoSelect.querySelector(`option[value="${productoId}"]`);
+    const unidadesPorPaquete = parseInt(option.dataset.unidadesPaquete) || 1;
+
+    if (modoIngreso === 'unidades') {
+        cantidad = parseInt(cantidadInput.value) || 1;
+    } else {
+        const numPaquetes = parseInt(paquetesInput.value) || 1;
+        cantidad = numPaquetes * unidadesPorPaquete;
     }
     
-    // Obtener información del producto seleccionado
-    const option = productoSelect.querySelector(`option[value="${productoId}"]`);
-    if (!option) {
-        alert('Producto no encontrado');
+    if (precio <= 0) {
+        alert('El precio debe ser mayor a cero');
         return;
     }
     
@@ -324,11 +379,12 @@ document.getElementById('agregarProductoBtn').addEventListener('click', function
     
     productosAgregados.push({
         producto_id: productoId,
-        nombre: nombre,
+        nombre: nombre + (vencimiento ? ` (Vence: ${vencimiento})` : ''),
         unidad: unidad,
         cantidad: cantidad,
         precio: precio,
-        precio_unitario: precio,  // Para compatibilidad con el backend
+        precio_unitario: precio,
+        fecha_vencimiento: vencimiento,
         editing: false
     });
     
@@ -343,7 +399,9 @@ document.getElementById('agregarProductoBtn').addEventListener('click', function
     }
     productoIdSeleccionado.value = '';
     cantidadInput.value = 1;
+    paquetesInput.value = 1;
     precioInput.value = '';
+    vencimientoInput.value = '';
     precioSugerido.textContent = '';
 });
 

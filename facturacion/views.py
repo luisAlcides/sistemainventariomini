@@ -146,7 +146,10 @@ def nueva_factura(request):
     
     # GET: Mostrar formulario
     form = FacturaForm()
-    productos = Producto.objects.filter(activo=True, stock_actual__gt=0).order_by('nombre_producto__nombre')
+    productos = Producto.objects.filter(
+        activo=True, 
+        stock_actual__gt=0
+    ).order_by('nombre_producto__nombre', 'fecha_expiracion')
     
     context = {
         'form': form,

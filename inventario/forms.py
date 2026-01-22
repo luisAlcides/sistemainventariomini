@@ -15,7 +15,7 @@ class ProductoForm(forms.ModelForm):
             'codigo', 'nombre_producto', 'descripcion', 'categoria', 
             'precio_venta', 'precio_compra', 'costo_promedio',
             'porcentaje_ganancia', 'actualizar_precio_automatico',
-            'stock_actual', 'stock_minimo', 'fecha_expiracion', 'activo'
+            'stock_actual', 'stock_minimo', 'unidades_por_paquete', 'fecha_expiracion', 'activo'
         ]
         widgets = {
             'codigo': forms.TextInput(attrs={
@@ -65,6 +65,10 @@ class ProductoForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'min': '0'
             }),
+            'unidades_por_paquete': forms.NumberInput(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
+                'min': '1'
+            }),
             'fecha_expiracion': forms.DateInput(format='%Y-%m-%d', attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'type': 'date'
@@ -83,8 +87,9 @@ class ProductoForm(forms.ModelForm):
             'costo_promedio': 'Costo Promedio (C$)',
             'porcentaje_ganancia': 'Porcentaje de Ganancia (%)',
             'actualizar_precio_automatico': 'Actualizar Precio Automáticamente',
-            'stock_actual': 'Stock Actual',
-            'stock_minimo': 'Stock Mínimo',
+            'stock_actual': 'Stock Actual (Unidades)',
+            'stock_minimo': 'Stock Mínimo (Unidades)',
+            'unidades_por_paquete': 'Unidades por Paquete/Caja',
             'fecha_expiracion': 'Fecha de Expiración',
             'activo': 'Producto Activo',
         }
@@ -202,7 +207,7 @@ class AjusteInventarioForm(forms.ModelForm):
     """
     class Meta:
         model = AjusteInventario
-        fields = ['producto', 'tipo_ajuste', 'cantidad_nueva', 'motivo']
+        fields = ['producto', 'tipo_ajuste', 'motivo', 'cantidad_nueva', 'observaciones']
         widgets = {
             'producto': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent'
@@ -210,21 +215,25 @@ class AjusteInventarioForm(forms.ModelForm):
             'tipo_ajuste': forms.Select(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent'
             }),
+            'motivo': forms.Select(attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent'
+            }),
             'cantidad_nueva': forms.NumberInput(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent',
                 'min': '0'
             }),
-            'motivo': forms.Textarea(attrs={
+            'observaciones': forms.Textarea(attrs={
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent',
                 'rows': 3,
-                'placeholder': 'Motivo del ajuste (obligatorio)'
+                'placeholder': 'Observaciones adicionales (opcional)'
             }),
         }
         labels = {
             'producto': 'Producto',
             'tipo_ajuste': 'Tipo de Ajuste',
-            'cantidad_nueva': 'Cantidad Nueva',
             'motivo': 'Motivo del Ajuste',
+            'cantidad_nueva': 'Nueva Cantidad Total (Física Real)',
+            'observaciones': 'Observaciones',
         }
     
     def __init__(self, *args, **kwargs):
