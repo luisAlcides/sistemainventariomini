@@ -80,11 +80,49 @@
                         <p class="text-sm text-gray-500">Stock Mínimo</p>
                         <p class="font-semibold text-gray-800">{{ producto.stock_minimo }} {{ producto.unidad_medida }}</p>
                     </div>
+                    {% if producto.fecha_expiracion %}
+                    <div>
+                        <p class="text-sm text-gray-500">Fecha de Expiración</p>
+                        <p class="font-semibold {% if producto.esta_expirado %}text-red-600{% elif producto.esta_por_expirar %}text-orange-600{% else %}text-gray-800{% endif %}">
+                            {{ producto.fecha_expiracion|date:"d/m/Y" }}
+                        </p>
+                        {% if producto.esta_expirado %}
+                        <p class="text-xs text-red-600 mt-1">
+                            <i class="fas fa-exclamation-circle mr-1"></i>Producto expirado
+                        </p>
+                        {% elif producto.esta_por_expirar %}
+                        <p class="text-xs text-orange-600 mt-1">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            Expira en {{ producto.dias_para_expiracion }} día{{ producto.dias_para_expiracion|pluralize }}
+                        </p>
+                        {% else %}
+                        <p class="text-xs text-gray-500 mt-1">
+                            Expira en {{ producto.dias_para_expiracion }} día{{ producto.dias_para_expiracion|pluralize }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    {% endif %}
                     {% if producto.esta_por_agotarse %}
                     <div class="bg-red-50 border-l-4 border-red-400 p-3">
                         <p class="text-sm text-red-700">
                             <i class="fas fa-exclamation-triangle mr-1"></i>
                             Este producto está por agotarse
+                        </p>
+                    </div>
+                    {% endif %}
+                    {% if producto.fecha_expiracion and producto.esta_por_expirar %}
+                    <div class="bg-orange-50 border-l-4 border-orange-400 p-3">
+                        <p class="text-sm text-orange-700">
+                            <i class="fas fa-clock mr-1"></i>
+                            Este producto está por expirar
+                        </p>
+                    </div>
+                    {% endif %}
+                    {% if producto.fecha_expiracion and producto.esta_expirado %}
+                    <div class="bg-red-50 border-l-4 border-red-400 p-3">
+                        <p class="text-sm text-red-700">
+                            <i class="fas fa-ban mr-1"></i>
+                            Este producto ha expirado
                         </p>
                     </div>
                     {% endif %}

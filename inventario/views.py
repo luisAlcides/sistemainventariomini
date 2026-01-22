@@ -8,6 +8,7 @@ from django.db.models import Q, F, Sum
 from django.db import transaction
 from django.utils import timezone
 from django.http import JsonResponse
+from datetime import timedelta
 import json
 
 from inventario.models import Producto, Categoria, EntradaCompra, DetalleEntradaCompra, AjusteInventario
@@ -32,10 +33,26 @@ def index(request):
         stock_actual__lte=F('stock_minimo')
     )[:10]
     
+    # Productos próximos a expirar (en los próximos 30 días)
+    fecha_limite = timezone.now().date() + timedelta(days=30)
+    productos_por_expirar = Producto.objects.filter(
+        activo=True,
+        fecha_expiracion__isnull=False,
+        fecha_expiracion__lte=fecha_limite
+    ).count()
+    
+    productos_proximos_expirar = Producto.objects.filter(
+        activo=True,
+        fecha_expiracion__isnull=False,
+        fecha_expiracion__lte=fecha_limite
+    ).order_by('fecha_expiracion')[:10]
+    
     context = {
         'total_productos': total_productos,
         'productos_por_agotarse': productos_por_agotarse,
         'productos_bajo_stock': productos_bajo_stock,
+        'productos_por_expirar': productos_por_expirar,
+        'productos_proximos_expirar': productos_proximos_expirar,
     }
     
     return render(request, 'inventario/index.html', context)
@@ -159,6 +176,36 @@ def productos_por_agotarse(request):
     }
     
     return render(request, 'inventario/productos_por_agotarse.html', context)
+
+
+@login_required
+def productos_por_expirar(request):
+    """
+    Lista de productos próximos a expirar.
+    """
+    # Obtener días desde parámetro (default: 30 días)
+    dias = int(request.GET.get('dias', 30))
+    fecha_limite = timezone.now().date() + timedelta(days=dias)
+    
+    productos = Producto.objects.filter(
+        activo=True,
+        fecha_expiracion__isnull=False,
+        fecha_expiracion__lte=fecha_limite
+    ).order_by('fecha_expiracion')
+    
+    # Separar productos expirados y próximos a expirar
+    fecha_actual = timezone.now().date()
+    productos_expirados = productos.filter(fecha_expiracion__lt=fecha_actual)
+    productos_proximos = productos.filter(fecha_expiracion__gte=fecha_actual)
+    
+    context = {
+        'productos': productos,
+        'productos_expirados': productos_expirados,
+        'productos_proximos': productos_proximos,
+        'dias': dias,
+    }
+    
+    return render(request, 'inventario/productos_por_expirar.html', context)
 
 
 @login_required

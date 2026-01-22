@@ -96,7 +96,7 @@ class DetalleFacturaForm(forms.ModelForm):
         self.fields['producto'].queryset = Producto.objects.filter(
             activo=True, 
             stock_actual__gt=0
-        ).order_by('nombre')
+        ).order_by('nombre_producto__nombre')
     
     def clean_cantidad(self):
         cantidad = self.cleaned_data.get('cantidad')

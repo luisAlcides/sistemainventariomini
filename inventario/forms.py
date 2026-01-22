@@ -15,7 +15,7 @@ class ProductoForm(forms.ModelForm):
             'codigo', 'nombre_producto', 'descripcion', 'categoria', 
             'precio_venta', 'precio_compra', 'costo_promedio',
             'porcentaje_ganancia', 'actualizar_precio_automatico',
-            'stock_actual', 'stock_minimo', 'activo'
+            'stock_actual', 'stock_minimo', 'fecha_expiracion', 'activo'
         ]
         widgets = {
             'codigo': forms.TextInput(attrs={
@@ -65,6 +65,10 @@ class ProductoForm(forms.ModelForm):
                 'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
                 'min': '0'
             }),
+            'fecha_expiracion': forms.DateInput(format='%Y-%m-%d', attrs={
+                'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
+                'type': 'date'
+            }),
             'activo': forms.CheckboxInput(attrs={
                 'class': 'w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500'
             }),
@@ -81,6 +85,7 @@ class ProductoForm(forms.ModelForm):
             'actualizar_precio_automatico': 'Actualizar Precio Automáticamente',
             'stock_actual': 'Stock Actual',
             'stock_minimo': 'Stock Mínimo',
+            'fecha_expiracion': 'Fecha de Expiración',
             'activo': 'Producto Activo',
         }
         
@@ -88,6 +93,14 @@ class ProductoForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Filtrar solo nombres de productos activos
         self.fields['nombre_producto'].queryset = NombreProducto.objects.filter(activo=True).order_by('nombre')
+        # Filtrar categorías activas
+        self.fields['categoria'].queryset = Categoria.objects.filter(activa=True).order_by('nombre')
+        # Asegurar que el campo de fecha de expiración esté visible
+        self.fields['fecha_expiracion'].required = False
+        self.fields['fecha_expiracion'].widget.attrs.update({
+            'class': 'w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent',
+            'type': 'date'
+        })
         # Si hay una categoría seleccionada, filtrar nombres por categoría
         if 'categoria' in self.data:
             try:
@@ -97,10 +110,6 @@ class ProductoForm(forms.ModelForm):
                 ).order_by('nombre')
             except (ValueError, TypeError):
                 pass
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['categoria'].queryset = Categoria.objects.filter(activa=True).order_by('nombre')
 
 
 class CategoriaForm(forms.ModelForm):

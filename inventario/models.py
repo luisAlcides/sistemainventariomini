@@ -180,6 +180,12 @@ class Producto(models.Model):
         verbose_name='Stock Mínimo',
         help_text='Cantidad mínima antes de alertar'
     )
+    fecha_expiracion = models.DateField(
+        blank=True,
+        null=True,
+        verbose_name='Fecha de Expiración',
+        help_text='Fecha de expiración del producto (opcional)'
+    )
     unidad_medida = models.CharField(
         max_length=20,
         default='unidad',
@@ -207,6 +213,7 @@ class Producto(models.Model):
             models.Index(fields=['codigo']),
             models.Index(fields=['categoria']),
             models.Index(fields=['activo']),
+            models.Index(fields=['fecha_expiracion']),
         ]
     
     def __str__(self):
@@ -225,6 +232,49 @@ class Producto(models.Model):
     def esta_por_agotarse(self):
         """Verifica si el producto está por agotarse (stock <= stock_minimo)."""
         return self.stock_actual <= self.stock_minimo
+    
+    def esta_por_expirar(self, dias_antes=30):
+        """
+        Verifica si el producto está por expirar dentro de los próximos días.
+        Args:
+            dias_antes: Número de días antes de la expiración para considerar como "por expirar" (default: 30)
+        Returns:
+            bool: True si está por expirar, False si no tiene fecha o no está por expirar
+        """
+        if not self.fecha_expiracion:
+            return False
+        from datetime import timedelta
+        fecha_limite = timezone.now().date() + timedelta(days=dias_antes)
+        return self.fecha_expiracion <= fecha_limite
+    
+    def esta_expirado(self):
+        """Verifica si el producto ya expiró."""
+        if not self.fecha_expiracion:
+            return False
+        return self.fecha_expiracion < timezone.now().date()
+    
+    def dias_para_expiracion(self):
+        """
+        Calcula los días restantes hasta la expiración.
+        Returns:
+            int: Días restantes (negativo si ya expiró, None si no tiene fecha)
+        """
+        if not self.fecha_expiracion:
+            return None
+        from datetime import timedelta
+        delta = self.fecha_expiracion - timezone.now().date()
+        return delta.days
+    
+    def dias_para_expiracion_abs(self):
+        """
+        Calcula los días absolutos hasta la expiración (siempre positivo).
+        Returns:
+            int: Días absolutos (0 si no tiene fecha)
+        """
+        if not self.fecha_expiracion:
+            return 0
+        dias = self.dias_para_expiracion()
+        return abs(dias) if dias is not None else 0
     
     def tiene_stock_suficiente(self, cantidad):
         """Verifica si hay stock suficiente para la cantidad solicitada."""

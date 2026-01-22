@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block title %}Productos por Expirar - Minisúper D'Pérez{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-clock mr-2 text-orange-500"></i>Productos por Expirar
+        </h1>
+        <div class="flex items-center space-x-4">
+            <form method="get" class="flex items-center space-x-2">
+                <label for="dias" class="text-sm text-gray-600">Mostrar productos que expiran en:</label>
+                <select name="dias" id="dias" onchange="this.form.submit()" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent">
+                    <option value="7" {% if dias == 7 %}selected{% endif %}>7 días</option>
+                    <option value="15" {% if dias == 15 %}selected{% endif %}>15 días</option>
+                    <option value="30" {% if dias == 30 %}selected{% endif %}>30 días</option>
+                    <option value="60" {% if dias == 60 %}selected{% endif %}>60 días</option>
+                    <option value="90" {% if dias == 90 %}selected{% endif %}>90 días</option>
+                </select>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Productos Expirados -->
+    {% if productos_expirados %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-red-50 px-6 py-4 border-b border-red-200">
+            <h2 class="text-xl font-bold text-red-800">
+                <i class="fas fa-ban mr-2"></i>Productos Expirados
+            </h2>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoría</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha de Expiración</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Días Expirados</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for producto in productos_expirados %}
+                <tr class="hover:bg-gray-50 bg-red-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ producto.codigo }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ producto.nombre }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ producto.categoria.nombre }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-red-600">
+                        {{ producto.fecha_expiracion|date:"d/m/Y" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-bold">
+                        {{ producto.dias_para_expiracion_abs }} día{{ producto.dias_para_expiracion_abs|pluralize }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ producto.stock_actual }} {{ producto.unidad_medida }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <a href="{% url 'inventario:detalle_producto' producto.id %}" class="text-blue-500 hover:text-blue-700">
+                            <i class="fas fa-eye mr-1"></i>Ver
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    
+    <!-- Productos Próximos a Expirar -->
+    {% if productos_proximos %}
+    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="bg-orange-50 px-6 py-4 border-b border-orange-200">
+            <h2 class="text-xl font-bold text-orange-800">
+                <i class="fas fa-exclamation-triangle mr-2"></i>Productos Próximos a Expirar (próximos {{ dias }} días)
+            </h2>
+        </div>
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Código</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoría</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha de Expiración</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Días Restantes</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                {% for producto in productos_proximos %}
+                <tr class="hover:bg-gray-50 {% if producto.esta_por_expirar %}bg-orange-50{% endif %}">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ producto.codigo }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ producto.nombre }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ producto.categoria.nombre }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold {% if producto.dias_para_expiracion <= 7 %}text-red-600{% elif producto.dias_para_expiracion <= 15 %}text-orange-600{% else %}text-gray-800{% endif %}">
+                        {{ producto.fecha_expiracion|date:"d/m/Y" }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm {% if producto.dias_para_expiracion <= 7 %}text-red-600 font-bold{% elif producto.dias_para_expiracion <= 15 %}text-orange-600 font-semibold{% else %}text-gray-600{% endif %}">
+                        {{ producto.dias_para_expiracion }} día{{ producto.dias_para_expiracion|pluralize }}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ producto.stock_actual }} {{ producto.unidad_medida }}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                        <a href="{% url 'inventario:detalle_producto' producto.id %}" class="text-blue-500 hover:text-blue-700">
+                            <i class="fas fa-eye mr-1"></i>Ver
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+    
+    {% if not productos_expirados and not productos_proximos %}
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <i class="fas fa-check-circle text-4xl text-green-500 mb-4"></i>
+        <p class="text-gray-600 text-lg">No hay productos próximos a expirar en los próximos {{ dias }} días</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

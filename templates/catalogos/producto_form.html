@@ -34,7 +34,12 @@
                         {{ form.nombre_producto.label }} <span class="text-red-500">*</span>
                     </label>
                     {{ form.nombre_producto }}
-                    <p class="text-xs text-gray-500 mt-1">Seleccione un nombre del catálogo</p>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Seleccione un nombre del catálogo o 
+                        <a href="{% url 'catalogos:nombre_producto_nuevo' %}" target="_blank" class="text-blue-600 hover:underline">
+                            crear uno nuevo
+                        </a>
+                    </p>
                     {% if form.nombre_producto.errors %}
                         <p class="text-red-500 text-xs mt-1">{{ form.nombre_producto.errors.0 }}</p>
                     {% endif %}
@@ -142,6 +147,17 @@
                     {{ form.stock_minimo }}
                     {% if form.stock_minimo.errors %}
                         <p class="text-red-500 text-xs mt-1">{{ form.stock_minimo.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                
+                <div>
+                    <label for="{{ form.fecha_expiracion.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-2">
+                        <i class="fas fa-calendar-alt mr-2 text-gray-500"></i>{{ form.fecha_expiracion.label }}
+                    </label>
+                    {{ form.fecha_expiracion }}
+                    <p class="text-xs text-gray-500 mt-1">Fecha de expiración del producto (opcional)</p>
+                    {% if form.fecha_expiracion.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.fecha_expiracion.errors.0 }}</p>
                     {% endif %}
                 </div>
                 

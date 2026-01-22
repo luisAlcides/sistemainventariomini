@@ -9,7 +9,7 @@
     </h1>
     
     <!-- Tarjetas de Resumen -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
             <p class="text-gray-500 text-sm font-medium">Total Productos</p>
             <p class="text-3xl font-bold text-gray-800">{{ total_productos }}</p>
@@ -17,6 +17,12 @@
         <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-red-500">
             <p class="text-gray-500 text-sm font-medium">Por Agotarse</p>
             <p class="text-3xl font-bold text-gray-800">{{ productos_por_agotarse }}</p>
+            <a href="{% url 'inventario:productos_por_agotarse' %}" class="text-xs text-blue-500 hover:underline mt-2 block">Ver todos →</a>
+        </div>
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500">
+            <p class="text-gray-500 text-sm font-medium">Por Expirar</p>
+            <p class="text-3xl font-bold text-gray-800">{{ productos_por_expirar }}</p>
+            <a href="{% url 'inventario:productos_por_expirar' %}" class="text-xs text-blue-500 hover:underline mt-2 block">Ver todos →</a>
         </div>
         <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
             <a href="{% url 'inventario:entrada_nueva' %}" class="block text-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition">
@@ -25,39 +31,84 @@
         </div>
     </div>
     
-    <!-- Productos por Agotarse -->
-    {% if productos_bajo_stock %}
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-4">
-            <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>Productos por Agotarse
-        </h2>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock Actual</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock Mínimo</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    {% for producto in productos_bajo_stock %}
-                    <tr>
-                        <td class="px-4 py-3 text-sm text-gray-900">{{ producto.nombre }}</td>
-                        <td class="px-4 py-3 text-sm text-red-600 font-semibold">{{ producto.stock_actual }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-600">{{ producto.stock_minimo }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <!-- Alertas -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Productos por Agotarse -->
+        {% if productos_bajo_stock %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>Productos por Agotarse
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock Actual</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock Mínimo</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for producto in productos_bajo_stock %}
+                        <tr>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ producto.nombre }}</td>
+                            <td class="px-4 py-3 text-sm text-red-600 font-semibold">{{ producto.stock_actual }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-600">{{ producto.stock_minimo }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4">
+                <a href="{% url 'inventario:productos_por_agotarse' %}" class="text-blue-500 text-sm hover:underline">
+                    Ver todos <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
         </div>
-        <div class="mt-4">
-            <a href="{% url 'inventario:productos_por_agotarse' %}" class="text-blue-500 text-sm hover:underline">
-                Ver todos <i class="fas fa-arrow-right ml-1"></i>
-            </a>
+        {% endif %}
+        
+        <!-- Productos Próximos a Expirar -->
+        {% if productos_proximos_expirar %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-clock mr-2 text-orange-500"></i>Productos Próximos a Expirar
+            </h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha Expiración</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Días Restantes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        {% for producto in productos_proximos_expirar %}
+                        <tr>
+                            <td class="px-4 py-3 text-sm text-gray-900">{{ producto.nombre }}</td>
+                            <td class="px-4 py-3 text-sm {% if producto.esta_expirado %}text-red-600{% elif producto.esta_por_expirar %}text-orange-600{% else %}text-gray-600{% endif %} font-semibold">
+                                {{ producto.fecha_expiracion|date:"d/m/Y" }}
+                            </td>
+                            <td class="px-4 py-3 text-sm {% if producto.dias_para_expiracion <= 7 %}text-red-600 font-bold{% elif producto.dias_para_expiracion <= 15 %}text-orange-600 font-semibold{% else %}text-gray-600{% endif %}">
+                                {% if producto.esta_expirado %}
+                                    Expirado ({{ producto.dias_para_expiracion_abs }} días)
+                                {% else %}
+                                    {{ producto.dias_para_expiracion }} día{{ producto.dias_para_expiracion|pluralize }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-4">
+                <a href="{% url 'inventario:productos_por_expirar' %}" class="text-blue-500 text-sm hover:underline">
+                    Ver todos <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
         </div>
+        {% endif %}
     </div>
-    {% endif %}
     
     <!-- Enlaces Rápidos -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
