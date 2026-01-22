@@ -82,49 +82,42 @@
                         <i class="fas fa-plus-circle mr-2 text-green-500"></i>Agregar Producto
                     </h2>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="space-y-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Producto</label>
-                            <div class="relative">
-                                <input type="text" id="productoSearch" 
-                                       placeholder="Buscar producto por nombre..."
-                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                       autocomplete="off">
-                                <div id="productoDropdown" class="hidden absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-                                    <!-- Se llenará dinámicamente -->
-                                </div>
-                            </div>
-                            <select id="productoSelect" class="hidden">
-                                <option value="">-- Seleccionar producto --</option>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Producto (Nombre o Código)</label>
+                            <select id="productoSelect" class="w-full">
+                                <option value="">-- Buscar producto por nombre o código --</option>
                                 {% for producto in productos %}
                                 <option value="{{ producto.id }}" 
                                         data-precio="{{ producto.precio_compra }}"
                                         data-costo-promedio="{{ producto.costo_promedio }}"
                                         data-nombre="{{ producto.nombre }}"
                                         data-unidad="{{ producto.unidad_medida }}">
-                                    {{ producto.nombre }}
+                                    [{{ producto.codigo }}] {{ producto.nombre }} (Costo prom: C$ {{ producto.costo_promedio|floatformat:2 }})
                                 </option>
                                 {% endfor %}
                             </select>
                             <input type="hidden" id="productoIdSeleccionado" value="">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad</label>
-                            <input type="number" id="cantidadInput" min="1" value="1"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Precio Unit. (C$)</label>
-                            <input type="number" id="precioInput" step="0.01" min="0"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                   placeholder="0.00">
-                            <p class="text-xs text-gray-500 mt-1" id="precioSugerido"></p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad</label>
+                                <input type="number" id="cantidadInput" min="1" value="1"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Precio Unit. (C$)</label>
+                                <input type="number" id="precioInput" step="0.01" min="0"
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                                       placeholder="0.00">
+                                <p class="text-xs text-gray-500 mt-1" id="precioSugerido"></p>
+                            </div>
                         </div>
                     </div>
                     <div class="mt-4">
                         <button type="button" id="agregarProductoBtn" 
                                 class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition">
-                            <i class="fas fa-plus mr-2"></i>Agregar Producto
+                            <i class="fas fa-plus mr-2"></i>Agregar Producto a la Lista
                         </button>
                     </div>
                 </div>
@@ -273,76 +266,33 @@ function renderizarProductos() {
     }, 100);
 }
 
-// Búsqueda de productos
+// Búsqueda de productos con Tom Select
 const productoSelect = document.getElementById('productoSelect');
-const productoSearch = document.getElementById('productoSearch');
-const productoDropdown = document.getElementById('productoDropdown');
 const productoIdSeleccionado = document.getElementById('productoIdSeleccionado');
 const precioInput = document.getElementById('precioInput');
 const precioSugerido = document.getElementById('precioSugerido');
 
-productoSearch.addEventListener('input', function() {
-    const searchTerm = this.value.toLowerCase();
-    const options = productoSelect.querySelectorAll('option');
-    
-    if (searchTerm.length === 0) {
-        productoDropdown.classList.add('hidden');
+// Escuchar cambios en el select (Tom Select actualiza el select original)
+productoSelect.addEventListener('change', function() {
+    const productoId = this.value;
+    if (!productoId) {
         productoIdSeleccionado.value = '';
         precioInput.value = '';
         precioSugerido.textContent = '';
         return;
     }
     
-    let html = '';
-    let count = 0;
+    const option = this.options[this.selectedIndex];
+    const nombre = option.dataset.nombre;
+    const precio = option.dataset.precio;
+    const costoPromedio = option.dataset.costoPromedio;
+    const unidad = option.dataset.unidad;
     
-    options.forEach(option => {
-        if (option.value && option.textContent.toLowerCase().includes(searchTerm)) {
-            html += `<div class="px-4 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100" 
-                         data-producto-id="${option.value}"
-                         data-precio="${option.dataset.precio}"
-                         data-costo-promedio="${option.dataset.costoPromedio}"
-                         data-nombre="${option.dataset.nombre}"
-                         data-unidad="${option.dataset.unidad}">
-                    <div class="font-medium text-gray-900">${option.dataset.nombre}</div>
-                    <div class="text-xs text-gray-500">Costo promedio: C$ ${parseFloat(option.dataset.costoPromedio || option.dataset.precio || 0).toFixed(2)}</div>
-                </div>`;
-            count++;
-        }
-    });
-    
-    if (count > 0) {
-        productoDropdown.innerHTML = html;
-        productoDropdown.classList.remove('hidden');
-        
-        // Agregar eventos a los items del dropdown
-        productoDropdown.querySelectorAll('div[data-producto-id]').forEach(item => {
-            item.addEventListener('click', function() {
-                const productoId = this.dataset.productoId;
-                const nombre = this.dataset.nombre;
-                const precio = this.dataset.precio;
-                const costoPromedio = this.dataset.costoPromedio;
-                const unidad = this.dataset.unidad;
-                
-                productoSearch.value = nombre;
-                productoIdSeleccionado.value = productoId;
-                precioInput.value = precio || costoPromedio || '';
-                precioSugerido.textContent = costoPromedio && parseFloat(costoPromedio) > 0 
-                    ? `Costo promedio: C$ ${parseFloat(costoPromedio).toFixed(2)}` 
-                    : '';
-                productoDropdown.classList.add('hidden');
-            });
-        });
-    } else {
-        productoDropdown.classList.add('hidden');
-    }
-});
-
-// Cerrar dropdown al hacer click fuera
-document.addEventListener('click', function(e) {
-    if (!productoSearch.contains(e.target) && !productoDropdown.contains(e.target)) {
-        productoDropdown.classList.add('hidden');
-    }
+    productoIdSeleccionado.value = productoId;
+    precioInput.value = precio || costoPromedio || '';
+    precioSugerido.textContent = costoPromedio && parseFloat(costoPromedio) > 0 
+        ? `Costo promedio: C$ ${parseFloat(costoPromedio).toFixed(2)}` 
+        : '';
 });
 
 document.getElementById('agregarProductoBtn').addEventListener('click', function() {
@@ -385,11 +335,16 @@ document.getElementById('agregarProductoBtn').addEventListener('click', function
     renderizarProductos();
     actualizarResumen();
     
-    // Limpiar formulario pero mantener el producto seleccionado
+    // Limpiar formulario
+    if (productoSelect.tomselect) {
+        productoSelect.tomselect.setValue('');
+    } else {
+        productoSelect.value = '';
+    }
+    productoIdSeleccionado.value = '';
     cantidadInput.value = 1;
     precioInput.value = '';
     precioSugerido.textContent = '';
-    // No limpiar el producto para poder agregarlo varias veces
 });
 
 function editarProducto(index) {

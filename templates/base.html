@@ -25,6 +25,31 @@
         }
     </script>
     
+    <!-- Tom Select para comboboxes buscables -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
+    
+    <style>
+        /* Ajustes para que Tom Select se vea bien con Tailwind */
+        .ts-wrapper {
+            width: 100% !important;
+        }
+        .ts-control {
+            border-radius: 0.5rem !important;
+            padding: 0.5rem 0.75rem !important;
+            border-color: #d1d5db !important; /* gray-300 */
+            width: 100% !important;
+        }
+        .ts-wrapper.focus .ts-control {
+            box-shadow: 0 0 0 2px #fff, 0 0 0 4px #22c55e !important; /* green-500 ring */
+            border-color: transparent !important;
+        }
+        .ts-dropdown {
+            border-radius: 0.5rem !important;
+            margin-top: 5px !important;
+        }
+    </style>
+    
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-gray-50">
@@ -129,6 +154,55 @@
             </div>
         </div>
     </footer>
+    
+    <script>
+        // Función para inicializar Tom Select
+        function initTomSelect(el) {
+            if (el.tomselect) return el.tomselect;
+            return new TomSelect(el, {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                placeholder: "Buscar opción...",
+                noResultsText: "No se encontraron resultados",
+                render: {
+                    no_results: function(data, escape) {
+                        return '<div class="no-results">No se encontraron resultados para "' + escape(data.input) + '"</div>';
+                    },
+                }
+            });
+        }
+
+        // Inicializar todos los selects al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('select:not(.no-tomselect)').forEach((el) => {
+                initTomSelect(el);
+            });
+        });
+
+        // Observador para inicializar nuevos selects agregados dinámicamente
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) { // ELEMENT_NODE
+                        if (node.tagName === 'SELECT' && !node.classList.contains('no-tomselect')) {
+                            initTomSelect(node);
+                        }
+                        node.querySelectorAll('select:not(.no-tomselect)').forEach((select) => {
+                            initTomSelect(select);
+                        });
+                    }
+                });
+            });
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    </script>
     
     {% block extra_js %}{% endblock %}
 </body>

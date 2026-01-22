@@ -63,23 +63,64 @@
                     </div>
                 </div>
                 
-                <!-- Resumen -->
+                <!-- Resumen y Pago -->
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h2 class="text-xl font-bold text-gray-800 mb-4">
-                        <i class="fas fa-calculator mr-2 text-green-500"></i>Resumen
+                        <i class="fas fa-calculator mr-2 text-green-500"></i>Resumen y Pago
                     </h2>
-                    <div class="space-y-3">
-                        <div class="flex justify-between">
+                    <div class="space-y-4">
+                        <div class="flex justify-between text-sm">
                             <span class="text-gray-600">Subtotal:</span>
                             <span class="font-semibold text-gray-800" id="subtotal">C$ 0.00</span>
                         </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Descuento:</span>
-                            <span class="font-semibold text-red-600" id="descuento">C$ 0.00</span>
+                        <div class="flex justify-between text-sm text-red-600">
+                            <span>Descuento:</span>
+                            <span class="font-semibold" id="descuentoResumen">C$ 0.00</span>
                         </div>
                         <div class="border-t pt-3 flex justify-between">
-                            <span class="text-lg font-bold text-gray-800">Total:</span>
-                            <span class="text-lg font-bold text-gray-800" id="total">C$ 0.00</span>
+                            <span class="text-lg font-bold text-gray-800">Total a Pagar:</span>
+                            <span class="text-lg font-bold text-green-600" id="total">C$ 0.00</span>
+                        </div>
+
+                        <!-- Sección de Pago -->
+                        <div class="pt-4 border-t space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Método de Pago</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button type="button" id="btnEfectivo" onclick="seleccionarMetodo('efectivo')"
+                                            class="py-2 px-4 rounded-lg border-2 border-blue-500 bg-blue-50 text-blue-700 font-semibold flex items-center justify-center transition">
+                                        <i class="fas fa-money-bill-wave mr-2"></i>Efectivo
+                                    </button>
+                                    <button type="button" id="btnTransferencia" onclick="seleccionarMetodo('transferencia')"
+                                            class="py-2 px-4 rounded-lg border-2 border-gray-200 bg-white text-gray-600 font-semibold flex items-center justify-center transition">
+                                        <i class="fas fa-university mr-2"></i>Transf.
+                                    </button>
+                                </div>
+                                <input type="hidden" name="metodo_pago" id="metodoPago" value="efectivo">
+                            </div>
+
+                            <div id="seccionEfectivo" class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Pagó con (C$)</label>
+                                    <input type="number" id="pagoCon" step="0.01" min="0" 
+                                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-xl font-bold text-blue-600"
+                                           placeholder="0.00">
+                                </div>
+                                <div class="bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-yellow-800 font-medium">Cambio (Vuelto):</span>
+                                        <span class="text-2xl font-bold text-yellow-900" id="vuelto">C$ 0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="seccionTransferencia" class="hidden">
+                                <div class="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                                    <p class="text-blue-800 text-xs flex items-center">
+                                        <i class="fas fa-info-circle mr-2"></i>Verifique el comprobante antes de guardar.
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -88,36 +129,56 @@
             <!-- Columna Derecha: Productos -->
             <div class="lg:col-span-2 space-y-6">
                 <!-- Agregar Producto -->
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">
-                        <i class="fas fa-plus-circle mr-2 text-green-500"></i>Agregar Producto
-                    </h2>
+                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                    <div class="bg-blue-600 px-6 py-4">
+                        <h2 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-search-plus mr-3"></i>Buscador de Productos
+                        </h2>
+                    </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Producto</label>
-                            <select id="productoSelect" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                                <option value="">-- Seleccionar producto --</option>
-                                {% for producto in productos %}
-                                <option value="{{ producto.id }}" 
-                                        data-precio="{{ producto.precio_venta }}"
-                                        data-stock="{{ producto.stock_actual }}"
-                                        data-nombre="{{ producto.nombre }}">
-                                    {{ producto.nombre }} - C$ {{ producto.precio_venta|floatformat:2 }} (Stock: {{ producto.stock_actual }})
-                                </option>
-                                {% endfor %}
-                            </select>
+                    <div class="p-6 space-y-6">
+                        <div class="relative group">
+                            <label class="block text-sm font-bold text-gray-700 mb-2 transition group-focus-within:text-blue-600">
+                                Escanee el código o escriba el nombre
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-20">
+                                    <i class="fas fa-barcode text-gray-400 group-focus-within:text-blue-500"></i>
+                                </div>
+                                <select id="productoSelect" class="w-full pl-10">
+                                    <option value="">-- Buscar por nombre o código de barras --</option>
+                                    {% for producto in productos %}
+                                    <option value="{{ producto.id }}" 
+                                            data-precio="{{ producto.precio_venta }}"
+                                            data-stock="{{ producto.stock_actual }}"
+                                            data-nombre="{{ producto.nombre }}">
+                                        [{{ producto.codigo }}] {{ producto.nombre }} - C$ {{ producto.precio_venta|floatformat:2 }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Cantidad</label>
-                            <input type="number" id="cantidadInput" min="1" value="1"
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                        </div>
-                        <div class="flex items-end">
-                            <button type="button" id="agregarProductoBtn" 
-                                    class="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-lg transition">
-                                <i class="fas fa-plus mr-2"></i>Agregar
-                            </button>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                            <div class="relative">
+                                <label class="block text-sm font-bold text-gray-700 mb-2">Cantidad a vender</label>
+                                <div class="flex items-center">
+                                    <button type="button" onclick="ajustarCantidad(-1)" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2 px-4 rounded-l-lg border border-gray-300 transition">
+                                        <i class="fas fa-minus"></i>
+                                    </button>
+                                    <input type="number" id="cantidadInput" min="1" value="1"
+                                           class="w-full text-center px-4 py-2 border-y border-gray-300 focus:ring-0 focus:outline-none text-xl font-bold text-gray-800">
+                                    <button type="button" onclick="ajustarCantidad(1)" class="bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-2 px-4 rounded-r-lg border border-gray-300 transition">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex items-end">
+                                <button type="button" id="agregarProductoBtn" 
+                                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition transform active:scale-95 flex items-center justify-center shadow-lg">
+                                    <i class="fas fa-cart-plus mr-3 text-xl"></i>AGREGAR AL CARRITO
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -153,8 +214,69 @@
 </div>
 
 <script>
-// Array para almacenar los productos agregados
+// Variables globales
 let productosAgregados = [];
+let totalGlobal = 0;
+
+// Función para ajustar cantidad con botones
+function ajustarCantidad(cambio) {
+    const input = document.getElementById('cantidadInput');
+    let valor = parseInt(input.value) || 1;
+    valor = Math.max(1, valor + cambio);
+    input.value = valor;
+}
+
+// Función para seleccionar método de pago
+function seleccionarMetodo(metodo) {
+    const btnEfectivo = document.getElementById('btnEfectivo');
+    const btnTransferencia = document.getElementById('btnTransferencia');
+    const seccionEfectivo = document.getElementById('seccionEfectivo');
+    const seccionTransferencia = document.getElementById('seccionTransferencia');
+    const inputMetodo = document.getElementById('metodoPago');
+
+    inputMetodo.value = metodo;
+
+    if (metodo === 'efectivo') {
+        btnEfectivo.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700');
+        btnEfectivo.classList.remove('border-gray-200', 'bg-white', 'text-gray-600');
+        btnTransferencia.classList.add('border-gray-200', 'bg-white', 'text-gray-600');
+        btnTransferencia.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700');
+        seccionEfectivo.classList.remove('hidden');
+        seccionTransferencia.classList.add('hidden');
+    } else {
+        btnTransferencia.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700');
+        btnTransferencia.classList.remove('border-gray-200', 'bg-white', 'text-gray-600');
+        btnEfectivo.classList.add('border-gray-200', 'bg-white', 'text-gray-600');
+        btnEfectivo.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700');
+        seccionTransferencia.classList.remove('hidden');
+        seccionEfectivo.classList.add('hidden');
+    }
+    calcularVuelto();
+}
+
+// Función para calcular vuelto
+function calcularVuelto() {
+    const pagoConInput = document.getElementById('pagoCon');
+    const vueltoSpan = document.getElementById('vuelto');
+    const metodo = document.getElementById('metodoPago').value;
+
+    if (metodo === 'efectivo') {
+        const pagoCon = parseFloat(pagoConInput.value) || 0;
+        const cambio = pagoCon - totalGlobal;
+        vueltoSpan.textContent = 'C$ ' + (cambio > 0 ? cambio.toFixed(2) : '0.00');
+        
+        if (cambio < 0 && pagoCon > 0) {
+            vueltoSpan.classList.add('text-red-600');
+            vueltoSpan.classList.remove('text-yellow-900');
+        } else {
+            vueltoSpan.classList.remove('text-red-600');
+            vueltoSpan.classList.add('text-yellow-900');
+        }
+    }
+}
+
+// Escuchar cambios en el monto pagado
+document.getElementById('pagoCon').addEventListener('input', calcularVuelto);
 
 // Función para actualizar el resumen
 function actualizarResumen() {
@@ -164,11 +286,14 @@ function actualizarResumen() {
     });
     
     const descuento = parseFloat(document.querySelector('#id_descuento').value) || 0;
-    const total = subtotal - descuento;
+    totalGlobal = subtotal - descuento;
     
     document.getElementById('subtotal').textContent = 'C$ ' + subtotal.toFixed(2);
-    document.getElementById('descuento').textContent = 'C$ ' + descuento.toFixed(2);
-    document.getElementById('total').textContent = 'C$ ' + total.toFixed(2);
+    document.getElementById('descuentoResumen').textContent = 'C$ ' + descuento.toFixed(2);
+    document.getElementById('total').textContent = 'C$ ' + totalGlobal.toFixed(2);
+    
+    // Actualizar vuelto también cuando cambia el total
+    calcularVuelto();
 }
 
 // Función para renderizar la lista de productos
@@ -179,6 +304,7 @@ function renderizarProductos() {
     if (productosAgregados.length === 0) {
         lista.innerHTML = '<p class="text-gray-500 text-center py-4">No hay productos agregados</p>';
         inputJson.value = '[]';
+        actualizarStockVisual();
         return;
     }
     
@@ -211,6 +337,58 @@ function renderizarProductos() {
     
     // Actualizar JSON oculto
     inputJson.value = JSON.stringify(productosAgregados);
+    
+    // Actualizar los stocks en el combobox
+    actualizarStockVisual();
+}
+
+// Función para actualizar el stock visual en el combobox
+function actualizarStockVisual() {
+    const select = document.getElementById('productoSelect');
+    if (!select || !select.tomselect) return;
+    
+    // Guardar los stocks originales si no se han guardado
+    if (!window.stocksOriginales) {
+        window.stocksOriginales = {};
+        for (let option of select.options) {
+            if (option.value) {
+                window.stocksOriginales[option.value] = parseInt(option.dataset.stock);
+            }
+        }
+    }
+    
+    for (let option of select.options) {
+        if (!option.value) continue;
+        
+        const id = option.value;
+        const stockOriginal = window.stocksOriginales[id];
+        
+        // Calcular cuánto se ha usado de este producto
+        const usado = productosAgregados
+            .filter(p => p.producto_id === id)
+            .reduce((sum, p) => sum + p.cantidad, 0);
+        
+        const disponible = stockOriginal - usado;
+        
+        // Actualizar el atributo data-stock para validaciones posteriores
+        option.dataset.stock = disponible;
+        
+        // Extraer los datos para reconstruir el texto
+        const nombre = option.dataset.nombre;
+        const precio = parseFloat(option.dataset.precio).toFixed(2);
+        // El texto original tiene el formato: [CODIGO] NOMBRE - C$ PRECIO (Stock: XX)
+        // Buscamos el código dentro de los corchetes
+        const matchCodigo = option.text.match(/\[(.*?)\]/);
+        const codigo = matchCodigo ? matchCodigo[1] : '';
+        
+        const nuevoTexto = `[${codigo}] ${nombre} - C$ ${precio} (Stock: ${disponible})`;
+        
+        // Actualizar Tom Select
+        select.tomselect.updateOption(id, {
+            text: nuevoTexto,
+            stock: disponible
+        });
+    }
 }
 
 // Función para agregar producto
@@ -260,7 +438,11 @@ document.getElementById('agregarProductoBtn').addEventListener('click', function
     actualizarResumen();
     
     // Limpiar campos
-    productoSelect.value = '';
+    if (productoSelect.tomselect) {
+        productoSelect.tomselect.setValue('');
+    } else {
+        productoSelect.value = '';
+    }
     cantidadInput.value = 1;
 });
 
