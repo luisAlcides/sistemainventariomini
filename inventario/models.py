@@ -522,8 +522,8 @@ class AjusteInventario(models.Model):
     Modelo para registrar ajustes de inventario (mermas, inventarios físicos, correcciones, etc.).
     """
     TIPO_AJUSTE_CHOICES = [
-        ('AUMENTO', 'Aumento (+)'),
-        ('DISMINUCION', 'Disminución (-)'),
+        ('ENTRADA', 'Entrada (+)'),
+        ('SALIDA', 'Salida (-)'),
     ]
 
     MOTIVO_CHOICES = [
@@ -533,6 +533,8 @@ class AjusteInventario(models.Model):
         ('VENCIMIENTO', 'Merma por Vencimiento'),
         ('ROBO', 'Merma por Robo/Pérdida'),
         ('CONSUMO', 'Consumo Interno'),
+        ('VENTA', 'Venta'),
+        ('ANULACION', 'Anulación de Venta'),
         ('OTRO', 'Otro Motivo'),
     ]
     
@@ -548,7 +550,7 @@ class AjusteInventario(models.Model):
         verbose_name='Tipo de Ajuste'
     )
     motivo = models.CharField(
-        max_length=30,
+        max_length=100,
         choices=MOTIVO_CHOICES,
         default='CORRECCION',
         verbose_name='Motivo del Ajuste'

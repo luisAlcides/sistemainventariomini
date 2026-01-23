@@ -251,7 +251,7 @@ def nueva_entrada(request):
             with transaction.atomic():
                 entrada = EntradaCompra.objects.create(
                     numero_factura=numero_factura,
-                    proveedor=proveedor,
+                    proveedor_id=int(proveedor) if proveedor.isdigit() else None,
                     fecha_compra=fecha_compra or timezone.now().date(),
                     observaciones=observaciones,
                     usuario_registro=request.user
