@@ -64,3 +64,18 @@ AGT-007,Jamón de pierna,Carnes y embutidos,Libra último stock,180.00,145.00,3,
 AGT-008,Chorizo,Carnes y embutidos,Libra último stock,120.00,95.00,4,5,1,25,2026-03-14,True
 AGT-009,Jugo naranja 1L,Bebidas,1L vence pronto,45.00,32.00,2,10,1,35,2026-03-16,True
 AGT-010,Leche entera,Lácteos,500ml vence pronto,25.00,18.00,1,15,1,35,2026-03-16,True
+FEC-001,Arroz blanco,Abarrotes,Bolsa 1 libra lote antiguo,25.00,18.00,45,20,1,30,2026-01-08,True
+FEC-002,Azúcar refinada,Abarrotes,Bolsa 1 libra lote enero,22.00,16.00,38,15,1,30,2026-01-12,True
+FEC-003,Aceite vegetal,Abarrotes,900ml lote anterior,85.00,65.00,22,12,1,30,2026-01-18,True
+FEC-004,Leche entera,Lácteos,1 litro lote enero,42.00,32.00,18,10,1,30,2026-01-22,True
+FEC-005,Queso crema,Lácteos,200g vencimiento próximo,55.00,42.00,12,5,1,30,2026-02-02,True
+FEC-006,Coca-Cola 500ml,Bebidas,500ml lote febrero,25.00,18.00,30,24,1,35,2026-02-05,True
+FEC-007,Jabón de barra,Limpieza,Unidad lote antiguo,12.00,8.00,55,20,1,40,2026-02-10,True
+FEC-008,Chorizo,Carnes y embutidos,Libra último lote,120.00,95.00,8,5,1,25,2026-02-14,True
+FEC-009,Pan blanco,Panadería,Unidad vence pronto,15.00,10.00,25,15,1,40,2026-02-16,True
+FEC-010,Atún en lata,Enlatados,170g lote febrero,35.00,26.00,28,15,1,30,2026-02-18,True
+FEC-011,Yogurt natural,Lácteos,1 litro vence 20/02,48.00,36.00,6,5,1,30,2026-02-20,True
+FEC-012,Mantequilla,Lácteos,200g vence 22/02,65.00,48.00,7,5,1,32,2026-02-22,True
+FEC-013,Harina de trigo,Abarrotes,1kg lote anterior,35.00,26.00,20,10,1,30,2026-02-23,True
+FEC-014,Pasta dental,Higiene personal,75ml vence pronto,45.00,32.00,15,12,1,35,2026-02-23,True
+FEC-015,Café molido,Abarrotes,500g lote febrero,120.00,95.00,10,8,1,25,2026-02-23,True

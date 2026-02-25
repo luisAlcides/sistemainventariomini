@@ -4,9 +4,14 @@
 
 {% block content %}
 <div class="space-y-6">
-    <h1 class="text-3xl font-bold text-gray-800">
-        <i class="fas fa-chart-bar mr-2 text-yellow-500"></i>Reportes
-    </h1>
+    <div class="flex justify-between items-center flex-wrap gap-4">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-chart-bar mr-2 text-yellow-500"></i>Reportes
+        </h1>
+        <a href="{% url 'reportes:graficos' %}" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition inline-flex items-center">
+            <i class="fas fa-chart-line mr-2"></i>Ver gráficos
+        </a>
+    </div>
     
     <!-- Resumen General -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -89,6 +94,17 @@
                     <i class="fas fa-user-friends mr-2"></i>Clientes Frecuentes
                 </a>
             </div>
+        </div>
+
+        <!-- Gráficos -->
+        <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+            <h2 class="text-xl font-bold text-gray-800 mb-4">
+                <i class="fas fa-chart-line mr-2 text-blue-500"></i>Gráficos
+            </h2>
+            <p class="text-sm text-gray-500 mb-4">Ventas por día, productos más vendidos y ventas por categoría.</p>
+            <a href="{% url 'reportes:graficos' %}" class="block w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                <i class="fas fa-chart-area mr-2"></i>Ver gráficos
+            </a>
         </div>
     </div>
 </div>

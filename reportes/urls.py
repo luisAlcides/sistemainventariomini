@@ -18,5 +18,7 @@ urlpatterns = [
     path('prediccion-desabastecimiento/', views.prediccion_desabastecimiento, name='prediccion_desabastecimiento'),
     path('tendencia-ventas/', views.tendencia_ventas, name='tendencia_ventas'),
     path('productos-complementarios/', views.productos_complementarios, name='productos_complementarios'),
+    # Gráficos
+    path('graficos/', views.graficos, name='graficos'),
 ]
 

@@ -528,3 +528,75 @@ def productos_complementarios(request):
     context = {'productos_con_complementarios': productos_con_complementarios}
     return render(request, 'reportes/productos_complementarios.html', context)
 
+
+@login_required
+def graficos(request):
+    """
+    Sección de gráficos: ventas por día, productos más vendidos, ventas por categoría.
+    """
+    hoy = date.today()
+    hace_30 = hoy - timedelta(days=30)
+
+    # 1. Ventas por día (últimos 30 días)
+    facturas_30 = Factura.objects.filter(
+        fecha_venta__date__gte=hace_30,
+        fecha_venta__date__lte=hoy,
+        estado='COMPLETADA',
+    )
+    from collections import defaultdict
+    ventas_por_dia = defaultdict(Decimal)
+    for d in range(31):
+        dia = hace_30 + timedelta(days=d)
+        if dia <= hoy:
+            ventas_por_dia[dia.isoformat()] = Decimal('0')
+    for f in facturas_30:
+        key = f.fecha_venta.date().isoformat()
+        ventas_por_dia[key] += f.total
+    dias_orden = sorted(ventas_por_dia.keys())
+    chart_ventas_dias = {
+        'labels': [d[8:10] + '/' + d[5:7] for d in dias_orden],
+        'data': [float(ventas_por_dia[d]) for d in dias_orden],
+    }
+
+    # 2. Top 10 productos más vendidos (últimos 30 días)
+    top_productos = DetalleFactura.objects.filter(
+        factura__fecha_venta__date__gte=hace_30,
+        factura__fecha_venta__date__lte=hoy,
+        factura__estado='COMPLETADA',
+    ).values(
+        'producto__nombre_producto__nombre',
+        'producto__codigo',
+    ).annotate(
+        total=Sum('cantidad'),
+        monto=Sum('subtotal'),
+    ).order_by('-total')[:10]
+    chart_productos = {
+        'labels': [p['producto__nombre_producto__nombre'] or p['producto__codigo'] for p in top_productos],
+        'data': [p['total'] for p in top_productos],
+        'monto': [float(p['monto'] or 0) for p in top_productos],
+    }
+
+    # 3. Ventas por categoría (últimos 30 días)
+    ventas_cat = DetalleFactura.objects.filter(
+        factura__fecha_venta__date__gte=hace_30,
+        factura__fecha_venta__date__lte=hoy,
+        factura__estado='COMPLETADA',
+    ).values(
+        'producto__categoria__nombre',
+    ).annotate(
+        total=Sum('subtotal'),
+    ).order_by('-total')
+    chart_categorias = {
+        'labels': [v['producto__categoria__nombre'] or 'Sin categoría' for v in ventas_cat],
+        'data': [float(v['total'] or 0) for v in ventas_cat],
+    }
+
+    context = {
+        'chart_ventas_dias': chart_ventas_dias,
+        'chart_productos': chart_productos,
+        'chart_categorias': chart_categorias,
+        'fecha_desde': hace_30,
+        'fecha_hasta': hoy,
+    }
+    return render(request, 'reportes/graficos.html', context)
+
