@@ -19,8 +19,12 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
-# CSRF Trusted Origins for production
-CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')])
+# CSRF Trusted Origins for production (Django 4.0+ requiere esquema http:// o https://)
+_raw_origins = config('CSRF_TRUSTED_ORIGINS', default='http://127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
+CSRF_TRUSTED_ORIGINS = [
+    o if o.startswith('http://') or o.startswith('https://') else 'http://' + o
+    for o in _raw_origins
+]
 
 
 # Application definition
@@ -128,9 +132,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else []
 
 # Configuración de WhiteNoise para producción
 STORAGES = {

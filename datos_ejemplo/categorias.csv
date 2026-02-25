@@ -1,0 +1,9 @@
+nombre,descripcion,activa
+Abarrotes,Productos de consumo básico y despensa,True
+Lácteos,Leche y derivados,True
+Bebidas,Bebidas sin alcohol y refrescos,True
+Limpieza,Productos de limpieza del hogar,True
+Carnes y embutidos,Carnes frescas y procesadas,True
+Panadería,Pan y productos de panadería,True
+Enlatados,Conservas y enlatados,True
+Higiene personal,Artículos de higiene y cuidado personal,True

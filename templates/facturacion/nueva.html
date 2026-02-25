@@ -198,6 +198,27 @@
                     <!-- Input oculto para enviar productos -->
                     <input type="hidden" name="productos" id="productosJson" value="[]">
                 </div>
+
+                <!-- Recomendaciones ML (se muestra al seleccionar cliente) -->
+                <div id="recomendacionesML" class="bg-white rounded-lg shadow-md overflow-hidden hidden">
+                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 px-6 py-4 flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-white flex items-center">
+                            <i class="fas fa-brain mr-3"></i>
+                            <span>Recomendaciones para <span id="recomendacionesClienteNombre"></span></span>
+                        </h2>
+                        <span class="text-purple-100 text-sm font-medium flex items-center">
+                            <i class="fas fa-robot mr-1"></i> Análisis con Machine Learning
+                        </span>
+                    </div>
+                    <div class="p-4">
+                        <p id="recomendacionesCargando" class="text-gray-500 text-center py-4 hidden">
+                            <i class="fas fa-spinner fa-spin mr-2"></i>Analizando preferencias del cliente...
+                        </p>
+                        <div id="recomendacionesLista" class="space-y-3">
+                            <!-- Se llena por JS -->
+                        </div>
+                    </div>
+                </div>
                 
                 <!-- Botones de Acción -->
                 <div class="flex justify-end space-x-4">
@@ -508,6 +529,91 @@ function eliminarProducto(index) {
 
 // Actualizar resumen cuando cambia el descuento
 document.querySelector('#id_descuento').addEventListener('input', actualizarResumen);
+
+// --- Recomendaciones con Machine Learning (al seleccionar cliente) ---
+const recomendacionesML = document.getElementById('recomendacionesML');
+const recomendacionesClienteNombre = document.getElementById('recomendacionesClienteNombre');
+const recomendacionesCargando = document.getElementById('recomendacionesCargando');
+const recomendacionesLista = document.getElementById('recomendacionesLista');
+const urlRecomendacionesBase = "{% url 'facturacion:recomendaciones_cliente' 0 %}".replace('/0/', '/');
+
+function cargarRecomendaciones(clienteId) {
+    if (!clienteId) {
+        recomendacionesML.classList.add('hidden');
+        return;
+    }
+    recomendacionesML.classList.remove('hidden');
+    recomendacionesLista.innerHTML = '';
+    recomendacionesCargando.classList.remove('hidden');
+
+    fetch(urlRecomendacionesBase + clienteId + '/', {
+        method: 'GET',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        credentials: 'same-origin'
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        recomendacionesCargando.classList.add('hidden');
+        recomendacionesClienteNombre.textContent = data.cliente_nombre || 'este cliente';
+
+        if (!data.recomendaciones || data.recomendaciones.length === 0) {
+            recomendacionesLista.innerHTML = '<p class="text-gray-500 text-center py-2">No hay recomendaciones disponibles para este cliente.</p>';
+            return;
+        }
+
+        let html = '<p class="text-gray-600 text-sm mb-3"><i class="fas fa-info-circle mr-1"></i> Productos que podrían interesarle según el análisis de preferencias:</p>';
+        data.recomendaciones.forEach(function(r) {
+            const confianzaPct = Math.round(r.confianza * 100);
+            html += `
+            <div class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-purple-50 hover:border-purple-200 transition">
+                <div class="flex-1 min-w-0">
+                    <div class="font-semibold text-gray-800">${r.nombre}</div>
+                    <div class="text-xs text-gray-500">${r.razon} — Confianza: ${confianzaPct}%</div>
+                    <div class="text-sm text-blue-600 font-bold mt-0.5">C$ ${parseFloat(r.precio_venta).toFixed(2)} <span class="text-gray-400 font-normal">· Stock: ${r.stock_actual}</span></div>
+                </div>
+                <button type="button" class="ml-3 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-semibold rounded-lg transition agregar-recomendado" 
+                        data-id="${r.id}" data-nombre="${r.nombre.replace(/"/g, '&quot;')}" data-precio="${r.precio_venta}" data-stock="${r.stock_actual}">
+                    <i class="fas fa-cart-plus mr-1"></i> Agregar
+                </button>
+            </div>`;
+        });
+        recomendacionesLista.innerHTML = html;
+
+        recomendacionesLista.querySelectorAll('.agregar-recomendado').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const nombre = this.getAttribute('data-nombre');
+                const precio = parseFloat(this.getAttribute('data-precio'));
+                const stock = parseInt(this.getAttribute('data-stock'), 10);
+
+                const existe = productosAgregados.findIndex(function(p) { return p.producto_id === id; });
+                if (existe !== -1) {
+                    if (productosAgregados[existe].cantidad >= stock) {
+                        alert('Stock insuficiente. Disponible: ' + stock + ' unidades');
+                        return;
+                    }
+                    productosAgregados[existe].cantidad += 1;
+                } else {
+                    productosAgregados.push({ producto_id: id, nombre: nombre, cantidad: 1, precio: precio });
+                }
+                renderizarProductos();
+                actualizarResumen();
+            });
+        });
+    })
+    .catch(function() {
+        recomendacionesCargando.classList.add('hidden');
+        recomendacionesLista.innerHTML = '<p class="text-red-500 text-center py-2">No se pudieron cargar las recomendaciones.</p>';
+    });
+}
+
+document.querySelector('#id_cliente').addEventListener('change', function() {
+    const clienteId = this.value;
+    cargarRecomendaciones(clienteId);
+});
 
 // Validar formulario antes de enviar
 document.getElementById('facturaForm').addEventListener('submit', function(e) {

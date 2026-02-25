@@ -1,0 +1,46 @@
+nombre,descripcion,categoria,unidad_medida,activo
+Arroz blanco,Grano premium,Abarrotes,libra,True
+Azúcar refinada,Azúcar blanca,Abarrotes,libra,True
+Aceite vegetal,Aceite de cocina 900ml,Abarrotes,unidad,True
+Frijol rojo,Frijol de primera,Abarrotes,libra,True
+Leche entera,Leche 1 litro,Lácteos,unidad,True
+Queso crema,Queso crema 200g,Lácteos,unidad,True
+Yogurt natural,Yogurt 1 litro,Lácteos,unidad,True
+Coca-Cola 500ml,Refresco 500ml,Bebidas,unidad,True
+Agua mineral 600ml,Agua purificada,Bebidas,unidad,True
+Jugo naranja 1L,Jugo de naranja,Bebidas,unidad,True
+Jabón de barra,Jabón para ropa,Limpieza,unidad,True
+Detergente líquido,Detergente 1 litro,Limpieza,unidad,True
+Cloro 1L,Desinfectante,Limpieza,unidad,True
+Chorizo,Chorizo nacional,Carnes y embutidos,libra,True
+Jamón de pierna,Jamón ahumado,Carnes y embutidos,libra,True
+Pan blanco,Pan de molde,Panadería,unidad,True
+Pan integral,Pan integral rebanado,Panadería,unidad,True
+Atún en lata,Atún en agua 170g,Enlatados,unidad,True
+Sardinas en salsa,Sardinas 425g,Enlatados,unidad,True
+Pasta dental,Pasta dental 75ml,Higiene personal,unidad,True
+Jabón corporal,Jabón de baño,Higiene personal,unidad,True
+Shampoo,Shampoo 400ml,Higiene personal,unidad,True
+Café molido,Café 500g,Abarrotes,unidad,True
+Sal,Sal refinada 500g,Abarrotes,unidad,True
+Harina de trigo,Harina 1kg,Abarrotes,unidad,True
+Maicena,Maicena 400g,Abarrotes,unidad,True
+Té negro,Bolsa 25 sobres,Abarrotes,unidad,True
+Mantequilla,Mantequilla 200g,Lácteos,unidad,True
+Crema de leche,Crema 200ml,Lácteos,unidad,True
+Pepsi 500ml,Refresco 500ml,Bebidas,unidad,True
+Gatorade 500ml,Bebida isotónica,Bebidas,unidad,True
+Cerveza nacional,Latilla 350ml,Bebidas,unidad,True
+Suavizante 1L,Suavizante de ropa,Limpieza,unidad,True
+Esponja de cocina,Unidad,Limpieza,unidad,True
+Salchichón,Embutido libra,Carnes y embutidos,libra,True
+Queso seco,Queso tipo duro libra,Carnes y embutidos,libra,True
+Pan de hamburguesa,Unidad,Panadería,unidad,True
+Queque pequeño,Porción,Panadería,unidad,True
+Frijol en lata 400g,Enlatado,Enlatados,unidad,True
+Maíz en lata 400g,Enlatado,Enlatados,unidad,True
+Crema dental,Crema dental 100ml,Higiene personal,unidad,True
+Desodorante,Desodorante roll-on,Higiene personal,unidad,True
+Papel higiénico,Rollo 4 capas,Higiene personal,unidad,True
+Leche condensada,Lata 395g,Abarrotes,unidad,True
+Salsa de tomate,Botella 400g,Abarrotes,unidad,True

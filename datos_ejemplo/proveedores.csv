@@ -1,0 +1,26 @@
+nombre,ruc,contacto,telefono,email,direccion,activo
+Distribuidora La Unión,RUC-001,Roberto Méndez,8888-1111,ventas@launion.com.ni,Carretera Norte Km 5 Managua,True
+Alimentos del Pacífico,RUC-002,María Sandino,7777-2222,compras@alipacifico.com.ni,Masaya Zona Franca,True
+Lácteos La Perfecta,RUC-003,José Téllez,8666-3333,pedidos@laperfecta.com.ni,Estelí,True
+Bebidas Nicaragua S.A.,RUC-004,Carmen Rivas,8555-4444,info@bebidasni.com.ni,Managua Industrial,True
+Proveedor Abarrotes Central,RUC-005,Luis Gutiérrez,8444-5555,central@abarrotes.com.ni,León,True
+Limpieza Total,RUC-006,Ana Martínez,8333-6666,ventas@limpiezatotal.com.ni,Managua,True
+Carnicería Don Pedro,,Pedro López,8222-7777,donpedro@email.com,Masaya mercado,True
+Panadería El Buen Pan,RUC-008,Sofia Hernández,8111-8888,elbuenpan@email.com,Granada,True
+Enlatados del Istmo,RUC-009,Carlos Núñez,8999-9999,istmo@enlatados.com.ni,Chinandega,True
+Higiene y Cuidado,RUC-010,Elena Vega,8777-0000,hyc@higiene.com.ni,Managua,True
+Granos Nacionales,,Miguel Ortega,8666-1111,granos@email.com,Matagalpa,True
+Distribuidora Norte,RUC-012,Rosa Ponce,8555-2222,norte@distribuidora.com.ni,Estelí,True
+Suministros García,RUC-013,Jorge García,8444-3333,suministros@garcia.com.ni,León,True
+Importadora del Sur,RUC-014,Patricia López,8333-4444,importadora@sur.com.ni,Managua,True
+Mayorista El Ahorro,RUC-015,Antonio Cruz,8222-5555,ahorro@mayorista.com.ni,Masaya,True
+Ferretería y Más,,Lucía Mendoza,8111-6666,ferreteria@email.com,Granada,True
+Droguería Salud,RUC-017,Ricardo Fuentes,8999-7777,salud@drogueria.com.ni,Managua,True
+Abarrotes Don Chepe,RUC-018,Francisco Pérez,8777-8888,donchepe@email.com,Jinotepe,True
+Cárnicos del Valle,RUC-019,Mónica Reyes,8666-9999,valle@carnicos.com.ni,Chinandega,True
+Pan y Dulces S.A.,RUC-020,Andrés Morales,8555-0000,info@panydulces.com.ni,Managua,True
+Bebidas y Refrescos,,Gabriela Soto,8444-1111,bebidas@email.com,Estelí,True
+Lácteos Frescos,RUC-022,Claudia Díaz,8333-2222,frescos@lacteos.com.ni,Matagalpa,True
+Conservas Nicaragua,RUC-023,Fernando Torres,8222-3333,conservas@nic.com.ni,León,True
+Suministros del Hogar,RUC-024,Isabel Ramírez,8111-4444,hogar@suministros.com.ni,Masaya,True
+Distribuidora Express,RUC-025,Roberto Castro,8999-5555,express@distribuidora.com.ni,Managua,True

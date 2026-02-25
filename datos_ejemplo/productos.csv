@@ -1,0 +1,66 @@
+codigo,nombre_producto,categoria,descripcion,precio_venta,precio_compra,stock_actual,stock_minimo,unidades_por_paquete,porcentaje_ganancia,fecha_expiracion,activo
+ARR-001,Arroz blanco,Abarrotes,Bolsa 1 libra,25.00,18.00,200,20,1,30,,True
+ARR-002,Arroz blanco,Abarrotes,Bolsa 5 libras,115.00,95.00,80,10,1,25,,True
+AZU-001,Azúcar refinada,Abarrotes,Bolsa 1 libra,22.00,16.00,150,15,1,30,,True
+AZU-002,Azúcar refinada,Abarrotes,Bolsa 5 libras,100.00,82.00,60,8,1,22,,True
+ACE-001,Aceite vegetal,Abarrotes,900ml,85.00,65.00,120,12,1,30,,True
+FRI-001,Frijol rojo,Abarrotes,Bolsa 1 libra,35.00,26.00,100,15,1,30,,True
+LEC-001,Leche entera,Lácteos,1 litro,42.00,32.00,90,10,1,30,,True
+QUE-001,Queso crema,Lácteos,200g,55.00,42.00,50,5,1,30,,True
+YOG-001,Yogurt natural,Lácteos,1 litro,48.00,36.00,45,5,1,30,,True
+COC-001,Coca-Cola 500ml,Bebidas,500ml,25.00,18.00,200,24,1,35,,True
+AGU-001,Agua mineral 600ml,Bebidas,600ml,15.00,10.00,300,30,1,40,,True
+JUG-001,Jugo naranja 1L,Bebidas,1 litro,45.00,32.00,80,10,1,35,,True
+JAB-001,Jabón de barra,Limpieza,Unidad,12.00,8.00,150,20,1,40,,True
+DET-001,Detergente líquido,Limpieza,1 litro,95.00,72.00,60,8,1,30,,True
+CLO-001,Cloro 1L,Limpieza,1 litro,28.00,20.00,100,12,1,35,,True
+CHO-001,Chorizo,Carnes y embutidos,Libra,120.00,95.00,30,5,1,25,,True
+JAM-001,Jamón de pierna,Carnes y embutidos,Libra,180.00,145.00,25,5,1,22,,True
+PAN-001,Pan blanco,Panadería,Unidad,15.00,10.00,80,15,1,40,,True
+PAN-002,Pan integral,Panadería,Unidad,22.00,16.00,50,10,1,35,,True
+ATU-001,Atún en lata,Enlatados,170g,35.00,26.00,120,15,1,30,,True
+SAR-001,Sardinas en salsa,Enlatados,425g,42.00,32.00,80,10,1,28,,True
+PAS-001,Pasta dental,Higiene personal,75ml,45.00,32.00,100,12,1,35,,True
+JAB-002,Jabón corporal,Higiene personal,Unidad,28.00,20.00,120,15,1,35,,True
+SHA-001,Shampoo,Higiene personal,400ml,95.00,72.00,70,8,1,30,,True
+CAF-001,Café molido,Abarrotes,500g,120.00,95.00,55,8,1,25,,True
+SAL-001,Sal,Abarrotes,500g,18.00,12.00,100,15,1,40,,True
+HAR-001,Harina de trigo,Abarrotes,1kg,35.00,26.00,80,10,1,30,,True
+MAI-001,Maicena,Abarrotes,400g,28.00,20.00,60,8,1,35,,True
+TEE-001,Té negro,Abarrotes,Bolsa 25 sobres,45.00,32.00,70,10,1,35,,True
+MAN-001,Mantequilla,Lácteos,200g,65.00,48.00,40,5,1,32,,True
+CRE-001,Crema de leche,Lácteos,200ml,38.00,28.00,55,8,1,32,,True
+PEP-001,Pepsi 500ml,Bebidas,500ml,24.00,17.00,180,20,1,35,,True
+GAT-001,Gatorade 500ml,Bebidas,500ml,42.00,32.00,65,8,1,28,,True
+CER-001,Cerveza nacional,Bebidas,350ml,35.00,26.00,120,15,1,30,,True
+SUA-001,Suavizante 1L,Limpieza,1 litro,88.00,68.00,45,6,1,28,,True
+ESP-001,Esponja de cocina,Limpieza,Unidad,18.00,12.00,80,15,1,40,,True
+SAL-002,Salchichón,Carnes y embutidos,Libra,95.00,75.00,35,5,1,25,,True
+QUE-002,Queso seco,Carnes y embutidos,Libra,165.00,132.00,28,5,1,23,,True
+PAN-003,Pan de hamburguesa,Panadería,Unidad,22.00,16.00,60,12,1,35,,True
+QUE-003,Queque pequeño,Panadería,Porción,28.00,20.00,40,8,1,35,,True
+FRI-002,Frijol en lata 400g,Enlatados,400g,32.00,24.00,90,12,1,30,,True
+MAI-002,Maíz en lata 400g,Enlatados,400g,28.00,21.00,85,10,1,30,,True
+PAS-002,Crema dental,Higiene personal,100ml,55.00,40.00,75,10,1,35,,True
+DES-001,Desodorante,Higiene personal,Roll-on,72.00,55.00,65,8,1,28,,True
+PAP-001,Papel higiénico,Higiene personal,Rollo 4 capas,38.00,28.00,150,20,1,32,,True
+LEC-002,Leche condensada,Abarrotes,Lata 395g,48.00,36.00,70,10,1,30,,True
+SAL-003,Salsa de tomate,Abarrotes,Botella 400g,42.00,32.00,80,10,1,28,,True
+ACE-002,Aceite vegetal,Abarrotes,1.8 litros,155.00,118.00,50,6,1,28,,True
+LEC-003,Leche entera,Lácteos,500ml,25.00,18.00,100,15,1,35,,True
+JUG-002,Jugo naranja 1L,Bebidas,500ml,28.00,20.00,90,12,1,35,,True
+DET-002,Detergente líquido,Limpieza,500ml,52.00,38.00,70,10,1,35,,True
+ATU-002,Atún en lata,Enlatados,400g,58.00,44.00,60,8,1,30,,True
+SHA-002,Shampoo,Higiene personal,200ml,52.00,38.00,85,10,1,35,,True
+CAF-002,Café molido,Abarrotes,250g,68.00,52.00,45,6,1,28,,True
+FRI-003,Frijol rojo,Abarrotes,Bolsa 2 libras,65.00,50.00,55,8,1,28,,True
+AGT-001,Yogurt natural,Lácteos,1 litro vence pronto,48.00,36.00,3,10,1,30,2026-02-20,True
+AGT-002,Leche entera,Lácteos,1 litro vence pronto,42.00,32.00,2,10,1,30,2026-02-22,True
+AGT-003,Mantequilla,Lácteos,200g vence pronto,65.00,48.00,4,8,1,32,2026-02-26,True
+AGT-004,Queso crema,Lácteos,200g vence pronto,55.00,42.00,1,5,1,30,2026-02-26,True
+AGT-005,Pan blanco,Panadería,Unidad último lote,15.00,10.00,5,15,1,40,2026-03-06,True
+AGT-006,Pan integral,Panadería,Unidad último lote,22.00,16.00,2,10,1,35,2026-03-08,True
+AGT-007,Jamón de pierna,Carnes y embutidos,Libra último stock,180.00,145.00,3,5,1,22,2026-03-12,True
+AGT-008,Chorizo,Carnes y embutidos,Libra último stock,120.00,95.00,4,5,1,25,2026-03-14,True
+AGT-009,Jugo naranja 1L,Bebidas,1L vence pronto,45.00,32.00,2,10,1,35,2026-03-16,True
+AGT-010,Leche entera,Lácteos,500ml vence pronto,25.00,18.00,1,15,1,35,2026-03-16,True

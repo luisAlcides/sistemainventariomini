@@ -1,0 +1,26 @@
+nombre,cedula,telefono,email,direccion,tipo_cliente,activo
+María López,001-250189-0001A,8888-1234,maria.lopez@email.com,Barrio San Judas Managua,REGULAR,True
+Carlos Martínez,001-150275-0002B,7777-5678,carlos.m@email.com,Reparto San Juan Managua,FRECUENTE,True
+Ana García,001-080392-0003C,8999-9012,ana.garcia@email.com,Colonia Centro León,REGULAR,True
+José Pérez,001-200185-0004D,8666-3456,jose.perez@email.com,Masaya centro,MAYORISTA,True
+Rosa Hernández,,8555-7890,rosa.h@email.com,Granada calle principal,REGULAR,True
+Luis Rodríguez,001-120478-0006F,8222-2345,luis.r@email.com,Estelí barrio norte,FRECUENTE,True
+Carmen Díaz,001-050591-0007G,8333-6789,carmen.d@email.com,Chinandega,REGULAR,True
+Pedro Sánchez,001-280376-0008H,8444-0123,pedro.s@email.com,Matagalpa,MAYORISTA,True
+Laura Morales,001-150890-0009I,8111-4567,laura.m@email.com,Managua Los Robles,FRECUENTE,True
+Miguel González,,8777-8901,miguel.g@email.com,Jinotepe Carazo,REGULAR,True
+Sofia Ramírez,001-220183-0010K,8666-2345,sofia.r@email.com,Managua Altamira,REGULAR,True
+Roberto Castro,001-100569-0011L,8555-6789,roberto.c@email.com,Masaya,FRECUENTE,True
+Elena Flores,001-030492-0012M,8444-0123,elena.f@email.com,León,REGULAR,True
+Fernando Ruiz,,8333-4567,fernando.r@email.com,Estelí,MAYORISTA,True
+Isabel Torres,001-180785-0014O,8222-8901,isabel.t@email.com,Granada,REGULAR,True
+Antonio Reyes,001-250190-0015P,8111-2345,antonio.r@email.com,Managua Bolonia,FRECUENTE,True
+Patricia Vargas,001-120477-0016Q,8999-5678,patricia.v@email.com,Masatepe,REGULAR,True
+Jorge Mendoza,,8777-9012,jorge.m@email.com,Managua San Juan,REGULAR,True
+Lucía Guzmán,001-080391-0018S,8666-3456,lucia.g@email.com,Diriamba,FRECUENTE,True
+Ricardo Soto,001-200584-0019T,8555-7890,ricardo.s@email.com,Chinandega,MAYORISTA,True
+Claudia Ríos,001-150689-0020U,8444-0123,claudia.r@email.com,Matagalpa,REGULAR,True
+Francisco Luna,,8333-4567,francisco.l@email.com,Jinotega,REGULAR,True
+Mónica Silva,001-220188-0022W,8222-8901,monica.s@email.com,Managua Las Colinas,FRECUENTE,True
+Andrés Delgado,001-100791-0023X,8111-2345,andres.d@email.com,León,REGULAR,True
+Gabriela Herrera,001-030584-0024Y,8999-5678,gabriela.h@email.com,Estelí,MAYORISTA,True
