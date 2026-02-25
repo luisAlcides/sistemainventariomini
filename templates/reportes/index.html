@@ -49,6 +49,9 @@
                 <a href="{% url 'reportes:ventas_rango' %}" class="block w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
                     <i class="fas fa-calendar-alt mr-2"></i>Ventas por Rango
                 </a>
+                <a href="{% url 'reportes:tendencia_ventas' %}" class="block w-full bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                    <i class="fas fa-chart-area mr-2"></i>Tendencia de Ventas
+                </a>
             </div>
         </div>
         
@@ -61,8 +64,14 @@
                 <a href="{% url 'reportes:productos_por_agotarse' %}" class="block w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
                     <i class="fas fa-exclamation-triangle mr-2"></i>Por Agotarse
                 </a>
+                <a href="{% url 'reportes:prediccion_desabastecimiento' %}" class="block w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                    <i class="fas fa-chart-line mr-2"></i>Predicción Desabastecimiento
+                </a>
                 <a href="{% url 'reportes:productos_mas_vendidos' %}" class="block w-full bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
                     <i class="fas fa-star mr-2"></i>Más Vendidos
+                </a>
+                <a href="{% url 'reportes:productos_complementarios' %}" class="block w-full bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
+                    <i class="fas fa-shopping-basket mr-2"></i>Productos Complementarios
                 </a>
                 <a href="{% url 'reportes:valor_inventario' %}" class="block w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 px-4 rounded-lg transition text-center">
                     <i class="fas fa-dollar-sign mr-2"></i>Valor de Inventario

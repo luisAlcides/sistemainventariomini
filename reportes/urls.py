@@ -14,5 +14,9 @@ urlpatterns = [
     path('valor-inventario/', views.valor_inventario, name='valor_inventario'),
     # Reportes de Clientes
     path('clientes-frecuentes/', views.clientes_frecuentes, name='clientes_frecuentes'),
+    # Análisis (ciencia de datos simulada)
+    path('prediccion-desabastecimiento/', views.prediccion_desabastecimiento, name='prediccion_desabastecimiento'),
+    path('tendencia-ventas/', views.tendencia_ventas, name='tendencia_ventas'),
+    path('productos-complementarios/', views.productos_complementarios, name='productos_complementarios'),
 ]
 

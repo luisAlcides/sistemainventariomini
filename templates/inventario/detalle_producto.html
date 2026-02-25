@@ -144,6 +144,24 @@
                 </div>
             </div>
         </div>
+
+        {% if complementarios %}
+        <div class="mt-6 pt-6 border-t">
+            <h3 class="font-semibold text-gray-700 mb-3 flex items-center">
+                <i class="fas fa-shopping-basket mr-2 text-indigo-500"></i>
+                Los clientes que compraron esto también compraron
+            </h3>
+            <p class="text-sm text-gray-500 mb-3">Análisis de compras conjuntas (market basket)</p>
+            <ul class="space-y-2">
+                {% for otro, veces in complementarios %}
+                <li class="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-lg">
+                    <a href="{% url 'inventario:detalle_producto' otro.id %}" class="font-medium text-blue-600 hover:underline">{{ otro.nombre }}</a>
+                    <span class="text-xs text-gray-500">{{ veces }} factura{{ veces|pluralize }}</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

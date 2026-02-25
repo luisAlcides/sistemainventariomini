@@ -13,6 +13,7 @@ import json
 
 from inventario.models import Producto, Categoria, EntradaCompra, DetalleEntradaCompra, AjusteInventario
 from .forms import ProductoForm, CategoriaForm, EntradaCompraForm, AjusteInventarioForm
+from reportes.views import obtener_complementarios_para_producto
 
 
 @login_required
@@ -152,9 +153,11 @@ def detalle_producto(request, producto_id):
     Ver detalle de un producto.
     """
     producto = get_object_or_404(Producto, id=producto_id)
+    complementarios = obtener_complementarios_para_producto(producto.id, limite=5)
     
     context = {
         'producto': producto,
+        'complementarios': complementarios,
     }
     
     return render(request, 'inventario/detalle_producto.html', context)

@@ -58,7 +58,7 @@
                 {% for producto in productos_vendidos %}
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ forloop.counter }}</td>
-                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ producto.producto__nombre }}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ producto.producto__nombre_producto__nombre }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ producto.producto__categoria__nombre }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ producto.cantidad_vendida }}</td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ producto.veces_vendido }}</td>

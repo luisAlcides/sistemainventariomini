@@ -245,7 +245,7 @@ def productos_mas_vendidos(request):
         factura__estado='COMPLETADA'
     ).values(
         'producto__id',
-        'producto__nombre',
+        'producto__nombre_producto__nombre',
         'producto__codigo',
         'producto__categoria__nombre'
     ).annotate(
@@ -338,4 +338,193 @@ def clientes_frecuentes(request):
     }
     
     return render(request, 'reportes/clientes_frecuentes.html', context)
+
+
+@login_required
+def prediccion_desabastecimiento(request):
+    """
+    Predicción de desabastecimiento (simulación ciencia de datos).
+    Productos con alta probabilidad de agotarse en los próximos 7 días,
+    basado en ventas de los últimos 30 días.
+    """
+    hoy = date.today()
+    hace_30 = hoy - timedelta(days=30)
+
+    ventas_30 = DetalleFactura.objects.filter(
+        factura__estado='COMPLETADA',
+        factura__fecha_venta__date__gte=hace_30,
+    ).values('producto_id').annotate(
+        ventas_30d=Sum('cantidad')
+    )
+    ventas_por_producto = {v['producto_id']: v['ventas_30d'] for v in ventas_30}
+
+    productos = Producto.objects.filter(activo=True, stock_actual__gt=0).select_related(
+        'nombre_producto', 'categoria'
+    )
+    resultados = []
+    for p in productos:
+        ventas_30d = ventas_por_producto.get(p.id, 0)
+        consumo_diario = ventas_30d / 30.0 if ventas_30d else 0
+        if consumo_diario > 0:
+            dias_estimados = p.stock_actual / consumo_diario
+        else:
+            dias_estimados = 999
+        if dias_estimados <= 7:
+            riesgo = 'Alto'
+            riesgo_clase = 'text-red-600 font-bold'
+        elif dias_estimados <= 14:
+            riesgo = 'Medio'
+            riesgo_clase = 'text-orange-600 font-semibold'
+        else:
+            riesgo = 'Bajo'
+            riesgo_clase = 'text-gray-600'
+        resultados.append({
+            'producto': p,
+            'ventas_30d': ventas_30d,
+            'consumo_diario': round(consumo_diario, 2),
+            'dias_estimados': round(dias_estimados, 1) if dias_estimados < 999 else None,
+            'riesgo': riesgo,
+            'riesgo_clase': riesgo_clase,
+        })
+
+    resultados.sort(key=lambda x: (999 if x['dias_estimados'] is None else x['dias_estimados']))
+    resultados = [r for r in resultados if r['riesgo'] != 'Bajo' or r['ventas_30d'] > 0][:50]
+
+    context = {
+        'resultados': resultados,
+        'fecha_desde': hace_30,
+        'fecha_hasta': hoy,
+    }
+    return render(request, 'reportes/prediccion_desabastecimiento.html', context)
+
+
+@login_required
+def tendencia_ventas(request):
+    """
+    Tendencia de ventas (alcista / estable / bajista) basada en regresión lineal
+    sobre totales semanales de las últimas 12 semanas.
+    """
+    hoy = date.today()
+    inicio = hoy - timedelta(days=7 * 12)
+    facturas = Factura.objects.filter(
+        fecha_venta__date__gte=inicio,
+        fecha_venta__date__lte=hoy,
+        estado='COMPLETADA',
+    )
+
+    from collections import defaultdict
+    por_semana = defaultdict(Decimal)
+    for f in facturas:
+        delta = (f.fecha_venta.date() - inicio).days
+        num_semana = delta // 7
+        por_semana[num_semana] += f.total
+
+    semanas_orden = sorted(por_semana.keys())
+    if len(semanas_orden) < 2:
+        tendencia = 'estable'
+        pendiente = 0
+        descripcion = 'Datos insuficientes para calcular tendencia'
+    else:
+        n = len(semanas_orden)
+        x = semanas_orden
+        y = [float(por_semana[k]) for k in x]
+        sum_x = sum(x)
+        sum_y = sum(y)
+        sum_xy = sum(xi * yi for xi, yi in zip(x, y))
+        sum_x2 = sum(xi * xi for xi in x)
+        denom = n * sum_x2 - sum_x * sum_x
+        pendiente = (n * sum_xy - sum_x * sum_y) / denom if denom != 0 else 0
+        promedio_y = sum_y / n if n else 0
+        umbral = promedio_y * 0.05 if promedio_y else 100
+        if pendiente > umbral:
+            tendencia = 'alcista'
+            descripcion = 'Las ventas muestran tendencia al alza en las últimas semanas'
+        elif pendiente < -umbral:
+            tendencia = 'bajista'
+            descripcion = 'Las ventas muestran tendencia a la baja en las últimas semanas'
+        else:
+            tendencia = 'estable'
+            descripcion = 'Las ventas se mantienen estables'
+
+    datos_grafico = [{'semana': s, 'total': float(por_semana[s])} for s in semanas_orden]
+
+    context = {
+        'tendencia': tendencia,
+        'pendiente': round(pendiente, 2),
+        'descripcion': descripcion,
+        'semanas_analizadas': len(semanas_orden),
+        'datos_grafico': datos_grafico,
+    }
+    return render(request, 'reportes/tendencia_ventas.html', context)
+
+
+def _productos_comprados_juntos():
+    """Pares (producto_a, producto_b) -> veces que aparecen en la misma factura."""
+    from collections import defaultdict
+    pares = defaultdict(int)
+    facturas = Factura.objects.filter(estado='COMPLETADA').prefetch_related('detalles')
+    for factura in facturas:
+        ids = list(factura.detalles.values_list('producto_id', flat=True).distinct())
+        for i in range(len(ids)):
+            for j in range(i + 1, len(ids)):
+                a, b = min(ids[i], ids[j]), max(ids[i], ids[j])
+                pares[(a, b)] += 1
+    return pares
+
+
+def obtener_complementarios_para_producto(producto_id, limite=5):
+    """Para un producto, devuelve lista de (Producto, veces) que se compran juntos."""
+    pares = _productos_comprados_juntos()
+    from collections import defaultdict
+    complementarios = defaultdict(int)
+    for (a, b), count in pares.items():
+        if count < 2:
+            continue
+        if a == producto_id:
+            complementarios[b] += count
+        elif b == producto_id:
+            complementarios[a] += count
+    ordenados = sorted(complementarios.items(), key=lambda x: -x[1])[:limite]
+    ids = [pid for pid, _ in ordenados]
+    productos_map = {p.id: p for p in Producto.objects.filter(id__in=ids).select_related('nombre_producto', 'categoria')}
+    return [(productos_map[pid], count) for pid, count in ordenados if pid in productos_map]
+
+
+@login_required
+def productos_complementarios(request):
+    """Reporte: productos que suelen comprarse juntos (market basket)."""
+    pares = _productos_comprados_juntos()
+    from collections import defaultdict
+    complementarios_por_producto = defaultdict(list)
+    for (a, b), count in pares.items():
+        if count < 2:
+            continue
+        complementarios_por_producto[a].append((b, count))
+        complementarios_por_producto[b].append((a, count))
+
+    for pid in complementarios_por_producto:
+        complementarios_por_producto[pid].sort(key=lambda x: -x[1])
+        complementarios_por_producto[pid] = complementarios_por_producto[pid][:5]
+
+    productos_con_complementarios = []
+    productos_ids = set(complementarios_por_producto.keys())
+    if productos_ids:
+        productos_map = {p.id: p for p in Producto.objects.filter(id__in=productos_ids).select_related('nombre_producto', 'categoria')}
+        for pid in sorted(productos_ids):
+            producto = productos_map.get(pid)
+            if not producto:
+                continue
+            complementarios = []
+            for otro_id, count in complementarios_por_producto[pid]:
+                otro = productos_map.get(otro_id)
+                if otro:
+                    complementarios.append({'producto': otro, 'veces': count})
+            if complementarios:
+                productos_con_complementarios.append({
+                    'producto': producto,
+                    'complementarios': complementarios,
+                })
+
+    context = {'productos_con_complementarios': productos_con_complementarios}
+    return render(request, 'reportes/productos_complementarios.html', context)
 

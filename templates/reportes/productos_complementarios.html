@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Productos Complementarios - Reportes{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">
+            <i class="fas fa-shopping-basket mr-2 text-indigo-500"></i>Productos que se compran juntos
+        </h1>
+        <span class="text-sm text-gray-500 bg-indigo-50 px-2 py-1 rounded">
+            <i class="fas fa-link mr-1"></i>Análisis Market Basket
+        </span>
+    </div>
+
+    <p class="text-gray-600">
+        Productos que suelen aparecer en la misma factura. Útil para promociones cruzadas y ubicación en tienda.
+    </p>
+
+    <div class="space-y-6">
+        {% for item in productos_con_complementarios %}
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-bold text-gray-800">
+                    <a href="{% url 'inventario:detalle_producto' item.producto.id %}" class="text-blue-600 hover:underline">
+                        {{ item.producto.nombre }}
+                    </a>
+                    <span class="text-gray-400 font-normal text-sm ml-2">({{ item.producto.codigo }})</span>
+                </h2>
+                <span class="text-sm text-gray-500">Los clientes también compraron:</span>
+            </div>
+            <ul class="flex flex-wrap gap-3">
+                {% for comp in item.complementarios %}
+                <li class="flex items-center space-x-2 bg-gray-50 rounded-lg px-4 py-2 border border-gray-100">
+                    <a href="{% url 'inventario:detalle_producto' comp.producto.id %}" class="font-medium text-blue-600 hover:underline">
+                        {{ comp.producto.nombre }}
+                    </a>
+                    <span class="text-xs text-gray-500">({{ comp.veces }} factura{{ comp.veces|pluralize }})</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% empty %}
+        <div class="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
+            No hay suficientes datos de facturas con múltiples productos para mostrar complementarios.
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="flex justify-between items-center">
+        <a href="{% url 'reportes:index' %}" class="text-blue-500 hover:underline">
+            <i class="fas fa-arrow-left mr-1"></i>Volver a Reportes
+        </a>
+        <a href="{% url 'reportes:productos_mas_vendidos' %}" class="text-green-500 hover:underline">
+            Productos más vendidos <i class="fas fa-arrow-right ml-1"></i>
+        </a>
+    </div>
+</div>
+{% endblock %}
