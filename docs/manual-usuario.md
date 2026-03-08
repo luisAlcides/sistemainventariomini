@@ -8,7 +8,7 @@ Sistema web de gestión para facturación, control de inventario y reportes del 
 
 ### 1.1 Iniciar sesión
 
-1. Abra el navegador y vaya a la dirección del sistema (por ejemplo: `http://127.0.0.1:8000/`).
+1. Abra el navegador y vaya a la dirección del sistema (por ejemplo: `https://sistemainventariomini-production.up.railway.app/`).
 2. Si no está autenticado, será redirigido a **Iniciar sesión**.
 3. Ingrese su **Usuario** y **Contraseña**.
 4. Pulse **Iniciar sesión**.
